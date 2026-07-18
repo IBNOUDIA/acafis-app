@@ -12,24 +12,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Copy backend files to EC2
-        run: |
-          rsync -avz --exclude='node_modules' --exclude='.env' \
-            acafis-backend/acafis-app/backend/ \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/backend/
-
-      - name: Restart backend
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            cd /home/ec2-user/backend &&
-            npm install --production &&
-            pm2 restart acafis-backend &&
-            echo '✅ Déploiement réussi !'
-          "
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/ec2-user
+            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -L https://api.github.com/repos/IBNOUDIA/acafis-app/tarball/main \
+              -o /tmp/acafis.tar.gz
+            tar -xzf /tmp/acafis.tar.gz -C /tmp/
+            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/routes /home/ec2-user/backend/
+            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/services /home/ec2-user/backend/
+            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/models /home/ec2-user/backend/
+            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/controllers /home/ec2-user/backend/
+            cp /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/server.js /home/ec2-user/backend/
+            cd /home/ec2-user/backend && npm install --production
+            pm2 restart acafis-backend
+            rm -rf /tmp/acafis.tar.gz /tmp/IBNOUDIA-acafis-app-*/
+            echo "✅ Déploiement réussi !"
