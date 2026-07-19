@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+node_modules/
+.env
+*.pem
+frontend/node_modules/
+acafis-backend/acafis-app/backend/node_modules/
+=======
 # Logs
 logs
 *.log
@@ -22,3 +29,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+>>>>>>> 5abecf521f666622b25fb728965d31da27e4070f
