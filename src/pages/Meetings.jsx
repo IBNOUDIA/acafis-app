@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { LOGO_NAV } from '../assets/logo';
+import Navbar from '../components/Navbar';
 
 export default function Meetings() {
+  const navigate = useNavigate();
   const [meetings, setMeetings]       = useState([]);
   const [nextMeeting, setNextMeeting] = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -82,32 +84,33 @@ export default function Meetings() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{ background: '#1a3a6b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Module Réunions</div>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button onClick={() => setShowForm(true)} style={{
-            background: '#c9973a', color: '#fff', border: 'none',
-            padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer',
-            fontWeight: 700, fontSize: '0.82rem'
-          }}>
-            + Nouvelle réunion
-          </button>
-          <a href="/dashboard" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.82rem' }}>
-            ← Dashboard
-          </a>
-        </div>
-      </nav>
+      {/* 🔑 Navbar partagée — hamburger, langue, déconnexion, lien mot de passe */}
+      <Navbar />
 
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>📅 Réunions CA & AG</h1>
-          <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Mode hybride — Présentiel + Jitsi Meet</p>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>📅 Réunions CA & AG</h1>
+            <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Mode hybride — Présentiel + Jitsi Meet</p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button onClick={() => setShowForm(true)} style={{
+              background: '#c9973a', color: '#fff', border: 'none',
+              padding: '0.55rem 1.1rem', borderRadius: '6px', cursor: 'pointer',
+              fontWeight: 700, fontSize: '0.82rem', fontFamily: 'inherit',
+            }}>
+              + Nouvelle réunion
+            </button>
+            {/* 🔑 navigate() au lieu de <a href> */}
+            <button onClick={() => navigate('/dashboard')} style={{
+              background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+              padding: '0.55rem 1rem', borderRadius: '6px', cursor: 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+            }}>
+              ← Dashboard
+            </button>
+          </div>
         </div>
 
         {/* ONGLETS */}

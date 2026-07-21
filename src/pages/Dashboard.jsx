@@ -1,23 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
-import { LOGO_NAV } from '../assets/logo';
+import Navbar from '../components/Navbar';
 
 export default function Dashboard() {
-  const { user, logout }              = useAuth();
+  const { user }                      = useAuth();
   const { i18n }                      = useTranslation();
+  const navigate                      = useNavigate();
   const [stats, setStats]             = useState(null);
   const [nextMeeting, setNextMeeting] = useState(null);
   const [members, setMembers]         = useState([]);
   const [payments, setPayments]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [countdown, setCountdown]     = useState({});
-
-  const changeLang = (lang) => {
-    i18n.changeLanguage(lang);
-    localStorage.setItem('acafis_lang', lang);
-  };
 
   const t = (fr, en, wo) => {
     if (i18n.language === 'en') return en;
@@ -66,11 +63,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    window.location.href = '/login';
-  };
-
   const formatDate = (date) => {
     if (!date) return '—';
     return new Date(date).toLocaleDateString('fr-CA', {
@@ -95,57 +87,8 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{
-        background: '#1a3a6b', padding: '1rem 2rem',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.2)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>
-            {t('Gestion CA', 'CA Management', 'Jëfandikool CA')}
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-
-          {/* 🌍 Sélecteur de langue */}
-          <div style={{ display: 'flex', gap: '0.25rem' }}>
-            {[
-              { code: 'fr', flag: '🇫🇷', label: 'FR' },
-              { code: 'en', flag: '🇬🇧', label: 'EN' },
-              { code: 'wo', flag: '🇸🇳', label: 'WO' },
-            ].map(lang => (
-              <button key={lang.code} onClick={() => changeLang(lang.code)} style={{
-                background: i18n.language === lang.code ? 'rgba(201,151,58,0.4)' : 'rgba(255,255,255,0.1)',
-                border: i18n.language === lang.code ? '1px solid #c9973a' : '1px solid rgba(255,255,255,0.2)',
-                color: '#fff', padding: '0.3rem 0.5rem', borderRadius: '6px',
-                cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600,
-                transition: 'all 0.2s'
-              }}>
-                {lang.flag}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ color: '#fff', fontWeight: 600, fontSize: '0.88rem' }}>
-              {user?.firstName} {user?.lastName}
-            </div>
-            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>
-              {user?.position || user?.role}
-            </div>
-          </div>
-          <button onClick={handleLogout} style={{
-            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-            color: '#fff', padding: '0.4rem 0.9rem', borderRadius: '6px',
-            cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600
-          }}>
-            {t('Déconnexion', 'Logout', 'Dem')}
-          </button>
-        </div>
-      </nav>
+      {/* 🔑 Navbar partagée — hamburger, langue, déconnexion, lien mot de passe */}
+      <Navbar />
 
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
 
@@ -214,14 +157,15 @@ export default function Dashboard() {
                       🎥 {t('Rejoindre Jitsi', 'Join Jitsi', 'Dugg Jitsi')}
                     </a>
                   )}
-                  <a href="/votes" style={{
+                  {/* 🔑 navigate() au lieu d'un <a href> classique qui rechargerait la page */}
+                  <button onClick={() => navigate('/votes')} style={{
                     background: 'rgba(255,255,255,0.15)', color: '#fff',
-                    padding: '0.6rem 1.2rem', borderRadius: '6px',
-                    textDecoration: 'none', fontWeight: 700, fontSize: '0.82rem',
-                    border: '1px solid rgba(255,255,255,0.3)'
+                    padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none',
+                    cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem',
+                    fontFamily: 'inherit',
                   }}>
                     🗳️ {t('Votes en ligne', 'Online Votes', 'Vote yi')}
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -346,11 +290,12 @@ export default function Dashboard() {
                           background: '#c9973a', color: '#fff', padding: '0.35rem 0.75rem',
                           borderRadius: '6px', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700
                         }}>💻 Jitsi</a>
-                        <a href="/meetings" style={{
+                        {/* 🔑 navigate() au lieu de <a href> */}
+                        <button onClick={() => navigate('/meetings')} style={{
                           background: 'rgba(255,255,255,0.15)', color: '#fff',
-                          padding: '0.35rem 0.75rem', borderRadius: '6px',
-                          textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700
-                        }}>📋 {t('Détails', 'Details', 'Xëtu')}</a>
+                          padding: '0.35rem 0.75rem', borderRadius: '6px', border: 'none',
+                          cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'inherit',
+                        }}>📋 {t('Détails', 'Details', 'Xëtu')}</button>
                       </div>
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#8a8a8a', textAlign: 'center' }}>
@@ -385,13 +330,15 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-                <a href="/payments" style={{
-                  display: 'block', textAlign: 'center', marginTop: '1rem',
-                  background: '#1a3a6b', color: '#fff', padding: '0.6rem',
-                  borderRadius: '8px', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700
+                {/* 🔑 navigate() au lieu de <a href> */}
+                <button onClick={() => navigate('/payments')} style={{
+                  display: 'block', width: '100%', textAlign: 'center', marginTop: '1rem',
+                  background: '#1a3a6b', color: '#fff', padding: '0.6rem', border: 'none',
+                  borderRadius: '8px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700,
+                  fontFamily: 'inherit',
                 }}>
                   💰 {t('Voir le détail financier', 'View financial details', 'Xool xaalis bi')}
-                </a>
+                </button>
               </div>
             </div>
 
@@ -409,7 +356,8 @@ export default function Dashboard() {
                   { icon: '📄', label: t('Documents', 'Documents', 'Papiye yi'),      sublabel: 'PV & rapports', path: '/documents',      color: '#023e8a' },
                   { icon: '🏗️', label: t('Projet Ndianda', 'Ndianda Project', 'Projet Ndianda'), sublabel: t('Avancement', 'Progress', 'Avancement'), path: '/project', color: '#2d6a4f' },
                 ].map((mod, i) => (
-                  <div key={i} onClick={() => window.location.href = mod.path} style={{
+                  // 🔑 navigate() au lieu de window.location.href — c'était la cause principale de la lenteur
+                  <div key={i} onClick={() => navigate(mod.path)} style={{
                     background: '#fff', borderRadius: '10px', padding: '1rem',
                     cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',

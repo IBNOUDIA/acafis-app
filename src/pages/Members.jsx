@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { LOGO_NAV, LOGO_CARD } from '../assets/logo';
+import { LOGO_CARD } from '../assets/logo';
+import Navbar from '../components/Navbar';
 
 const statusConfig = {
   'à_jour':        { color: '#2d6a4f', bg: '#eaf4ee', label: '✅ En règle' },
@@ -101,7 +103,7 @@ function MemberCardModal({ member, onClose }) {
               {/* En-tête carte */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <img src={LOGO_CARD} alt="CoopACАFIS"
+                  <img src={LOGO_CARD} alt="CoopACAFIS"
                     style={{ height: '36px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <div style={{ background: status.color, padding: '3px 8px', borderRadius: '10px', fontSize: '9px', fontWeight: 700 }}>
@@ -192,7 +194,7 @@ function MemberCardModal({ member, onClose }) {
                 {/* Pied verso */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <img src={LOGO_CARD} alt="CoopACАFIS"
+                    <img src={LOGO_CARD} alt="CoopACAFIS"
                       style={{ height: '28px', objectFit: 'contain', opacity: 0.7 }} />
                   </div>
                   <div style={{ fontSize: '8px', color: '#8a8a8a', textAlign: 'right', lineHeight: 1.6 }}>
@@ -236,6 +238,7 @@ function MemberCardModal({ member, onClose }) {
 }
 
 export default function Members() {
+  const navigate = useNavigate();
   const [members, setMembers]               = useState([]);
   const [loading, setLoading]               = useState(true);
   const [search, setSearch]                 = useState('');
@@ -278,23 +281,24 @@ export default function Members() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{ background: '#1a3a6b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Module Membres</div>
-        </div>
-        <a href="/dashboard" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.82rem' }}>
-          ← Dashboard
-        </a>
-      </nav>
+      {/* 🔑 Navbar partagée — hamburger, langue, déconnexion, lien mot de passe */}
+      <Navbar />
 
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>👥 Membres Acquéreurs</h1>
-          <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Liste officielle AG — 46 membres — Cité Jardin Ndianda</p>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>👥 Membres Acquéreurs</h1>
+            <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Liste officielle AG — 46 membres — Cité Jardin Ndianda</p>
+          </div>
+          {/* 🔑 navigate() au lieu de <a href> */}
+          <button onClick={() => navigate('/dashboard')} style={{
+            background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+            padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer',
+            fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+          }}>
+            ← Dashboard
+          </button>
         </div>
 
         {/* STATS */}
