@@ -9,6 +9,7 @@ import Vote           from './pages/Vote';
 import Documents      from './pages/Documents';
 import Communications from './pages/Communications';
 import Ndianda from './pages/Ndianda';
+import ChangePassword from './pages/ChangePassword';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ function PublicRoute({ children }) {
 }
 
 function AppRoutes() {
+  console.log('URL ACTUELLE:', window.location.pathname);
   return (
     <Routes>
       <Route path="/login" element={
@@ -29,9 +31,12 @@ function AppRoutes() {
       <Route path="/dashboard" element={
         <PrivateRoute><Dashboard /></PrivateRoute>
       } />
+      <Route path="/profile/password" element={
+        <PrivateRoute><ChangePassword /></PrivateRoute>
+      } />
       <Route path="/project" element={
-  <PrivateRoute><Ndianda /></PrivateRoute>
-} />
+        <PrivateRoute><Ndianda /></PrivateRoute>
+      } />
       <Route path="/payments" element={
         <PrivateRoute><Finance /></PrivateRoute>
       } />
