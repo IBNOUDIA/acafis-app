@@ -7,7 +7,6 @@ import Navbar from '../components/Navbar';
 export default function ChangePassword() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
-  console.log('CHANGEPASSWORD CHARGE !');
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -47,8 +46,6 @@ export default function ChangePassword() {
       setLoading(false);
     }
   };
-
-  console.log('JUSTE AVANT LE RETURN');
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>

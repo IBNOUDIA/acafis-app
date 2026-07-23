@@ -49,6 +49,26 @@ export default function Meetings() {
     }
   };
 
+  // 🔑 Nouvelle fonction — génère et télécharge le brouillon de PV en PDF
+  const handleGeneratePv = async () => {
+    try {
+      const response = await api.get(`/meetings/${nextMeeting._id}/generate-pv`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Brouillon_PV_${nextMeeting.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors de la génération du PV');
+    }
+  };
+
   const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
@@ -328,6 +348,14 @@ export default function Meetings() {
                       cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem'
                     }}>
                       📄 Télécharger la convocation
+                    </button>
+                    {/* 🔑 Nouveau bouton — génère le brouillon de PV en PDF */}
+                    <button onClick={handleGeneratePv} style={{
+                      background: '#c9973a', color: '#fff', border: 'none',
+                      padding: '0.75rem 1.5rem', borderRadius: '8px',
+                      cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem'
+                    }}>
+                      📝 Générer le brouillon de PV
                     </button>
                   </div>
                 </div>
