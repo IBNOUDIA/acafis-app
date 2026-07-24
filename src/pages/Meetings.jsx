@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 export default function Meetings() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [meetings, setMeetings]       = useState([]);
   const [nextMeeting, setNextMeeting] = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -49,7 +51,7 @@ export default function Meetings() {
     }
   };
 
-  // 🔑 Nouvelle fonction — génère et télécharge le brouillon de PV en PDF
+  // Génère et télécharge le brouillon de PV en PDF
   const handleGeneratePv = async () => {
     try {
       const response = await api.get(`/meetings/${nextMeeting._id}/generate-pv`, {
@@ -66,6 +68,48 @@ export default function Meetings() {
     } catch (err) {
       console.error(err);
       alert('Erreur lors de la génération du PV');
+    }
+  };
+
+  // 🔑 Télécharge la convocation en PDF
+  const handleDownloadConvocation = async () => {
+    try {
+      const response = await api.get(`/convocations/${nextMeeting._id}/download`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Convocation_${nextMeeting.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du téléchargement de la convocation');
+    }
+  };
+
+  // 🔑 Envoie d'abord un test à toi-même, puis demande confirmation pour envoyer à tous
+  const handleSendConvocations = async () => {
+    try {
+      await api.post(`/convocations/${nextMeeting._id}/test`, {
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
+      });
+
+      const confirmed = window.confirm(
+        `Un email de test vient d'être envoyé à ${user.email}.\n\nVérifiez votre boîte de réception, puis cliquez OK pour envoyer la convocation à TOUS les membres du CA, ou Annuler pour ne pas envoyer.`
+      );
+
+      if (!confirmed) return;
+
+      const res = await api.post(`/convocations/${nextMeeting._id}`);
+      alert(res.data.message);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Erreur lors de l\'envoi des convocations');
     }
   };
 
@@ -122,7 +166,6 @@ export default function Meetings() {
             }}>
               + Nouvelle réunion
             </button>
-            {/* 🔑 navigate() au lieu de <a href> */}
             <button onClick={() => navigate('/dashboard')} style={{
               background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
               padding: '0.55rem 1rem', borderRadius: '6px', cursor: 'pointer',
@@ -341,7 +384,8 @@ export default function Meetings() {
                     }}>
                       💻 Rejoindre via Jitsi Meet
                     </a>
-                    <button style={{
+                    {/* 🔑 branché sur handleDownloadConvocation */}
+                    <button onClick={handleDownloadConvocation} style={{
                       background: 'rgba(255,255,255,0.15)', color: '#fff',
                       border: '1px solid rgba(255,255,255,0.3)',
                       padding: '0.75rem 1.5rem', borderRadius: '8px',
@@ -349,7 +393,6 @@ export default function Meetings() {
                     }}>
                       📄 Télécharger la convocation
                     </button>
-                    {/* 🔑 Nouveau bouton — génère le brouillon de PV en PDF */}
                     <button onClick={handleGeneratePv} style={{
                       background: '#c9973a', color: '#fff', border: 'none',
                       padding: '0.75rem 1.5rem', borderRadius: '8px',
@@ -397,7 +440,8 @@ export default function Meetings() {
                         <span style={{ fontSize: '0.72rem', color: doc.color, fontWeight: 700 }}>{doc.status}</span>
                       </div>
                     ))}
-                    <button style={{
+                    {/* 🔑 branché sur handleSendConvocations */}
+                    <button onClick={handleSendConvocations} style={{
                       width: '100%', marginTop: '1rem', background: '#1a3a6b', color: '#fff',
                       border: 'none', padding: '0.7rem', borderRadius: '8px',
                       cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem'
