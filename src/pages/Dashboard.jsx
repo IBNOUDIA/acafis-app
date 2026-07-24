@@ -238,16 +238,16 @@ export default function Dashboard() {
                     <svg width="120" height="120" viewBox="0 0 120 120">
                       <circle cx="60" cy="60" r="48" fill="none" stroke="#ede9e0" strokeWidth="16" />
                       <circle cx="60" cy="60" r="48" fill="none" stroke="#2d6a4f" strokeWidth="16"
-                        strokeDasharray={`${(membresPresents / 46) * 301} 301`}
+                        strokeDasharray={`${(membresPresents / (stats?.total || 1)) * 301} 301`}
                         strokeLinecap="round" transform="rotate(-90 60 60)" />
                       <circle cx="60" cy="60" r="48" fill="none" stroke="#c9973a" strokeWidth="16"
-                        strokeDasharray={`${(10 / 46) * 301} 301`}
+                        strokeDasharray={`${(10 / (stats?.total || 1)) * 301} 301`}
                         strokeLinecap="round"
-                        strokeDashoffset={`-${(membresPresents / 46) * 301}`}
+                        strokeDashoffset={`-${(membresPresents / (stats?.total || 1)) * 301}`}
                         transform="rotate(-90 60 60)" />
                     </svg>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a3a6b' }}>46</div>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a3a6b' }}>{stats?.total || 0}</div>
                       <div style={{ fontSize: '0.6rem', color: '#8a8a8a' }}>{t('membres', 'members', 'xarit')}</div>
                     </div>
                   </div>
@@ -349,7 +349,7 @@ export default function Dashboard() {
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.85rem' }}>
                 {[
-                  { icon: '👥', label: t('Membres', 'Members', 'Xarit yi'),          sublabel: '46 acquéreurs', path: '/members',        color: '#1a3a6b' },
+                  { icon: '👥', label: t('Membres', 'Members', 'Xarit yi'),          sublabel: `${stats?.total || 0} acquéreurs`, path: '/members',        color: '#1a3a6b' },
                   { icon: '📅', label: t('Réunions', 'Meetings', 'Réunion yi'),       sublabel: 'CA & AG',       path: '/meetings',       color: '#2d6a4f' },
                   { icon: '💰', label: t('Finance', 'Finance', 'Xaalis bi'),          sublabel: 'BHS',           path: '/payments',       color: '#c9973a' },
                   { icon: '🗳️', label: t('Votes', 'Votes', 'Vote yi'),               sublabel: 'AG & CA',       path: '/votes',          color: '#4a1942' },

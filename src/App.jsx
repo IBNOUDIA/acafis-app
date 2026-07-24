@@ -10,7 +10,7 @@ import Documents      from './pages/Documents';
 import Communications from './pages/Communications';
 import Ndianda from './pages/Ndianda';
 import ChangePassword from './pages/ChangePassword';
-
+import Sondages from './pages/Sondages';
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
@@ -34,6 +34,9 @@ function AppRoutes() {
       <Route path="/profile/password" element={
         <PrivateRoute><ChangePassword /></PrivateRoute>
       } />
+      <Route path="/sondages" element={
+  <PrivateRoute><Sondages /></PrivateRoute>
+} />
       <Route path="/project" element={
         <PrivateRoute><Ndianda /></PrivateRoute>
       } />

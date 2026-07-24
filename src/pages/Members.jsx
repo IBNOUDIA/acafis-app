@@ -584,6 +584,7 @@ export default function Members() {
         <AddMemberModal
           onClose={() => setShowAddForm(false)}
           onSuccess={() => {
+            fetchData(); // 🔑 recharge la liste — c'était l'oubli qui causait le bug
             setMessage('✅ Membre créé avec succès');
             setTimeout(() => setMessage(''), 3000);
           }}
