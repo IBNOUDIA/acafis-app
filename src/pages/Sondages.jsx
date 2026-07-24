@@ -84,6 +84,33 @@ export default function Sondages() {
     }
   };
 
+  // 🔑 Partage le sondage par email à tous les membres CA + copie le lien
+  const handleShare = async (pollId) => {
+    try {
+      const res = await api.post(`/polls/${pollId}/share`);
+      const link = res.data.link;
+      await navigator.clipboard.writeText(link);
+      setMessage(`✅ ${res.data.message} — lien copié dans le presse-papier`);
+      setTimeout(() => setMessage(''), 4000);
+    } catch (err) {
+      setMessage('❌ Erreur lors du partage');
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
+
+  // 🔑 Copie juste le lien de la page Sondages, sans envoyer d'email
+  const handleCopyLink = async () => {
+    try {
+      const link = `${window.location.origin}/sondages`;
+      await navigator.clipboard.writeText(link);
+      setMessage('✅ Lien copié !');
+      setTimeout(() => setMessage(''), 2000);
+    } catch (err) {
+      setMessage('❌ Impossible de copier le lien');
+      setTimeout(() => setMessage(''), 2000);
+    }
+  };
+
   const addOptionField = () => setForm({ ...form, options: [...form.options, ''] });
   const updateOption = (i, val) => {
     const opts = [...form.options];
@@ -190,7 +217,22 @@ export default function Sondages() {
                       </div>
                     </div>
                     {isAdmin && (
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {/* 🔑 Nouveaux boutons de partage */}
+                        <button onClick={handleCopyLink} style={{
+                          background: '#eef2f8', color: '#1a3a6b', border: 'none',
+                          padding: '0.35rem 0.7rem', borderRadius: '6px',
+                          cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700
+                        }}>
+                          🔗 Copier lien
+                        </button>
+                        <button onClick={() => handleShare(poll._id)} style={{
+                          background: '#eaf4ee', color: '#2d6a4f', border: 'none',
+                          padding: '0.35rem 0.7rem', borderRadius: '6px',
+                          cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700
+                        }}>
+                          📧 Partager
+                        </button>
                         {isOpen && (
                           <button onClick={() => handleClose(poll._id)} style={{
                             background: '#f8f5ef', color: '#c0392b', border: '1px solid #f5c6c0',
