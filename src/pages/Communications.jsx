@@ -93,10 +93,11 @@ export default function Communications() {
   };
 
   const audienceConfig = {
-    tous:       { label: '🌐 Tous',        color: '#1a3a6b' },
-    ca:         { label: '🏛️ CA seulement', color: '#4a1942' },
-    acquereurs: { label: '👥 Acquéreurs',  color: '#2d6a4f' },
-  };
+  tous:        { label: '🌐 Tous',              color: '#1a3a6b' },
+  ca:          { label: '🏛️ CA',                color: '#4a1942' },
+  ca_elargi:   { label: '🏛️ CA élargi',         color: '#c9973a' },
+  acquereurs:  { label: '👥 AG (Acquéreurs)',   color: '#2d6a4f' },
+};
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
@@ -309,11 +310,12 @@ export default function Communications() {
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Audience
                 </label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                   {[
                     { value: 'tous',       label: '🌐 Tous' },
-                    { value: 'ca',         label: '🏛️ CA' },
-                    { value: 'acquereurs', label: '👥 Acquéreurs' },
+{ value: 'ca',         label: '🏛️ CA' },
+{ value: 'ca_elargi',  label: '🏛️ CA élargi' },
+{ value: 'acquereurs', label: '👥 AG' },
                   ].map(aud => (
                     <button key={aud.value} type="button"
                       onClick={() => setForm({ ...form, audience: aud.value })}
