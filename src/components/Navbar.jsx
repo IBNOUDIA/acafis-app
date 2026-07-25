@@ -12,6 +12,7 @@ const MENU_ITEMS = [
   { path: '/payments',  icon: '💰', label: { fr: 'Finance',        en: 'Finance',   wo: 'Xaalis bi' } },
   { path: '/votes',     icon: '🗳️', label: { fr: 'Votes',          en: 'Votes',     wo: 'Vote yi' } },
   { path: '/sondages',  icon: '📊', label: { fr: 'Sondages',       en: 'Polls',     wo: 'Sondage yi' } },
+  { path: '/communications', icon: '📢', label: { fr: 'Communications', en: 'Communications', wo: 'Communications' } },
   { path: '/documents', icon: '📄', label: { fr: 'Documents',      en: 'Documents', wo: 'Papiye yi' } },
   { path: '/project',   icon: '🏗️', label: { fr: 'Projet Ndianda', en: 'Ndianda Project', wo: 'Projet Ndianda' } },
 ];
