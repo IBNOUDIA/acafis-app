@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fees = require('../config/fees');
 
 const memberSchema = new mongoose.Schema({
   user:         { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -26,6 +27,7 @@ const memberSchema = new mongoose.Schema({
     totalAmount:  { type: Number, default: 0 },   // Montant total dû
     paidAmount:   { type: Number, default: 0 },   // Montant payé
     balance:      { type: Number, default: 0 },   // Solde restant
+    partSocialPaye: { type: Boolean, default: false }, // Part social (250 000 FCFA) réglé une fois
     status: {
       type: String,
       enum: ['à_jour', 'retard_mineur', 'retard_majeur', 'suspendu'],
@@ -40,6 +42,11 @@ const memberSchema = new mongoose.Schema({
   },
   joinDate:     { type: Date, default: Date.now },
   notes:        { type: String },
+  // 🔑 Commission(s) dont l'acquéreur fait partie (en plus des membres du bureau)
+  commissions: [{
+    type: String,
+    enum: ['habitat', 'finance', 'communication', 'juridique'],
+  }],
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
@@ -49,6 +56,12 @@ const memberSchema = new mongoose.Schema({
 // Virtual : nom complet
 memberSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
+});
+
+// Virtual : montant théorique dû selon la règle officielle
+// (250 000 FCFA de part social une fois + 100 000 FCFA par année écoulée depuis l'adhésion)
+memberSchema.virtual('montantAttenduTheorique').get(function () {
+  return fees.calculerMontantDu(this.joinDate);
 });
 
 // Calculer solde automatiquement

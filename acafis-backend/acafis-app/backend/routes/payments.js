@@ -31,7 +31,22 @@ router.get('/', authorize('super_admin','admin','admin_finance'), async (req, re
 router.post('/', authorize('super_admin','admin','admin_finance'), async (req, res) => {
   try {
     const payment = await Payment.create({ ...req.body, createdBy: req.user._id });
+    await Payment.recalculerMembre(payment.member);
     res.status(201).json({ success: true, message: 'Paiement enregistré', payment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+});
+
+// Modifier paiement (corriger montant, date, méthode, etc.)
+router.put('/:id', authorize('super_admin','admin_finance'), async (req, res) => {
+  try {
+    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, runValidators: true,
+    });
+    if (!payment) return res.status(404).json({ success: false, message: 'Paiement introuvable' });
+    await Payment.recalculerMembre(payment.member);
+    res.status(200).json({ success: true, message: 'Paiement mis à jour', payment });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
@@ -46,7 +61,20 @@ router.put('/:id/confirm', authorize('super_admin','admin_finance'), async (req,
       { new: true }
     );
     if (!payment) return res.status(404).json({ success: false, message: 'Paiement introuvable' });
+    await Payment.recalculerMembre(payment.member);
     res.status(200).json({ success: true, message: 'Paiement confirmé', payment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+});
+
+// Supprimer paiement
+router.delete('/:id', authorize('super_admin','admin_finance'), async (req, res) => {
+  try {
+    const payment = await Payment.findByIdAndDelete(req.params.id);
+    if (!payment) return res.status(404).json({ success: false, message: 'Paiement introuvable' });
+    await Payment.recalculerMembre(payment.member);
+    res.status(200).json({ success: true, message: 'Paiement supprimé' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
