@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { LOGO_NAV, LOGO_CARD } from '../assets/logo';
+import { LOGO_CARD } from '../assets/logo';
+import Navbar from '../components/Navbar';
 
 const statusConfig = {
   'à_jour':        { color: '#2d6a4f', bg: '#eaf4ee', label: '✅ En règle' },
@@ -62,7 +64,6 @@ function MemberCardModal({ member, onClose }) {
         boxShadow: '0 24px 60px rgba(0,0,0,0.4)'
       }} onClick={e => e.stopPropagation()}>
 
-        {/* En-tête */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h2 style={{ color: '#1a3a6b', margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>
@@ -78,10 +79,8 @@ function MemberCardModal({ member, onClose }) {
           }}>✕</button>
         </div>
 
-        {/* CARTE */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
           {!flipped ? (
-            /* ── RECTO ── */
             <div style={{
               width: '340px', height: '210px',
               background: 'linear-gradient(135deg, #1a3a6b 0%, #2e5090 60%, #1a3a6b 100%)',
@@ -89,19 +88,16 @@ function MemberCardModal({ member, onClose }) {
               overflow: 'hidden', color: '#fff',
               boxShadow: '0 8px 32px rgba(26,58,107,0.4)', flexShrink: 0,
             }}>
-              {/* Ligne dorée */}
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
                 background: 'linear-gradient(90deg, #c9973a, #f0c060, #c9973a)' }} />
-              {/* Cercles décoratifs */}
               <div style={{ position: 'absolute', top: '-40px', right: '-40px',
                 width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
               <div style={{ position: 'absolute', bottom: '-50px', left: '-20px',
                 width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
 
-              {/* En-tête carte */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <img src={LOGO_CARD} alt="CoopACАFIS"
+                  <img src={LOGO_CARD} alt="CoopACAFIS"
                     style={{ height: '36px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <div style={{ background: status.color, padding: '3px 8px', borderRadius: '10px', fontSize: '9px', fontWeight: 700 }}>
@@ -109,7 +105,6 @@ function MemberCardModal({ member, onClose }) {
                 </div>
               </div>
 
-              {/* Infos membre */}
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{
                   width: '50px', height: '50px', borderRadius: '50%',
@@ -133,7 +128,6 @@ function MemberCardModal({ member, onClose }) {
                 </div>
               </div>
 
-              {/* Numéro + QR */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '14px' }}>
                 <div>
                   <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -150,7 +144,6 @@ function MemberCardModal({ member, onClose }) {
               </div>
             </div>
           ) : (
-            /* ── VERSO ── */
             <div style={{
               width: '340px', height: '210px',
               background: '#f8f5ef', borderRadius: '16px', padding: '18px',
@@ -163,7 +156,6 @@ function MemberCardModal({ member, onClose }) {
                 height: '32px', background: '#1a3a6b', opacity: 0.07 }} />
 
               <div style={{ marginTop: '6px' }}>
-                {/* Statut */}
                 <div style={{
                   background: status.bg, border: `1px solid ${status.color}30`,
                   borderRadius: '8px', padding: '7px 12px', marginBottom: '10px',
@@ -173,7 +165,6 @@ function MemberCardModal({ member, onClose }) {
                   <span style={{ fontSize: '11px', color: status.color, fontWeight: 800 }}>{status.label}</span>
                 </div>
 
-                {/* Montants */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                   {[
                     { label: 'Montant dû', value: (member.financial?.totalAmount||0).toLocaleString('fr-FR') },
@@ -189,10 +180,9 @@ function MemberCardModal({ member, onClose }) {
                   ))}
                 </div>
 
-                {/* Pied verso */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <img src={LOGO_CARD} alt="CoopACАFIS"
+                    <img src={LOGO_CARD} alt="CoopACAFIS"
                       style={{ height: '28px', objectFit: 'contain', opacity: 0.7 }} />
                   </div>
                   <div style={{ fontSize: '8px', color: '#8a8a8a', textAlign: 'right', lineHeight: 1.6 }}>
@@ -206,7 +196,6 @@ function MemberCardModal({ member, onClose }) {
           )}
         </div>
 
-        {/* Flip */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
           <button onClick={() => setFlipped(!flipped)} style={{
             background: 'none', border: '1px solid #ede9e0',
@@ -217,7 +206,6 @@ function MemberCardModal({ member, onClose }) {
           </button>
         </div>
 
-        {/* Actions */}
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <button onClick={() => window.print()} style={{
             flex: 1, background: '#1a3a6b', color: '#fff', border: 'none',
@@ -235,28 +223,303 @@ function MemberCardModal({ member, onClose }) {
   );
 }
 
+// 🔑 Formulaire d'ajout de membre
+function AddMemberModal({ onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    firstName: '', lastName: '', email: '', phone: '',
+    lotType: 'villa_F3', lotNumber: '', lotPrice: '',
+    totalAmount: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await api.post('/members', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        lot: {
+          type: form.lotType,
+          number: form.lotNumber,
+          price: form.lotPrice ? Number(form.lotPrice) : undefined,
+        },
+        financial: {
+          totalAmount: form.totalAmount ? Number(form.totalAmount) : 0,
+        },
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de la création du membre');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem'
+    }}>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <h2 style={{ color: '#1a3a6b', margin: 0 }}>👥 Ajouter un membre</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8a8a8a' }}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Prénom *</label>
+              <input required value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Nom *</label>
+              <input required value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Email *</label>
+            <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Téléphone</label>
+            <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Type de logement</label>
+              <select value={form.lotType} onChange={e => setForm({ ...form, lotType: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px' }}>
+                <option value="villa_F3">Villa F3</option>
+                <option value="villa_F4">Villa F4</option>
+                <option value="villa_F5">Villa F5</option>
+                <option value="villa_F6">Villa F6</option>
+                <option value="appartement">Appartement</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>N° du lot</label>
+              <input value={form.lotNumber} onChange={e => setForm({ ...form, lotNumber: e.target.value })}
+                placeholder="Ex: V-023"
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Prix du lot (FCFA)</label>
+              <input type="number" value={form.lotPrice} onChange={e => setForm({ ...form, lotPrice: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Montant total dû (FCFA)</label>
+              <input type="number" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          {error && <div style={{ color: '#c0392b', fontSize: '0.82rem', marginBottom: '1rem' }}>⚠️ {error}</div>}
+
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '0.75rem', background: '#f8f5ef',
+              border: '1px solid #ede9e0', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, color: '#666'
+            }}>Annuler</button>
+            <button type="submit" disabled={loading} style={{
+              flex: 2, padding: '0.75rem', background: '#1a3a6b',
+              border: 'none', borderRadius: '8px', cursor: loading ? 'default' : 'pointer',
+              fontWeight: 700, color: '#fff', opacity: loading ? 0.7 : 1
+            }}>{loading ? 'Création...' : '✅ Créer le membre'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// 🔑 Nouveau — formulaire de modification d'un membre existant
+function EditMemberModal({ member, onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    firstName: member.firstName || '',
+    lastName: member.lastName || '',
+    email: member.email || '',
+    phone: member.phone || '',
+    status: member.status || 'actif',
+    totalAmount: member.financial?.totalAmount ?? '',
+    paidAmount: member.financial?.paidAmount ?? '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const totalAmount = form.totalAmount ? Number(form.totalAmount) : 0;
+      const paidAmount = form.paidAmount ? Number(form.paidAmount) : 0;
+      await api.put(`/members/${member._id}`, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        status: form.status,
+        financial: {
+          ...member.financial,
+          totalAmount,
+          paidAmount,
+          balance: totalAmount - paidAmount,
+        },
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de la modification du membre');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem'
+    }}>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <h2 style={{ color: '#1a3a6b', margin: 0 }}>✏️ Modifier {member.firstName} {member.lastName}</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8a8a8a' }}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Prénom *</label>
+              <input required value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Nom *</label>
+              <input required value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Email *</label>
+            <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Téléphone</label>
+            <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Statut membre</label>
+            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px' }}>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+              <option value="suspendu">Suspendu</option>
+              <option value="désisté">Désisté</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Montant total dû (FCFA)</label>
+              <input type="number" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Montant payé (FCFA)</label>
+              <input type="number" value={form.paidAmount} onChange={e => setForm({ ...form, paidAmount: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+          <div style={{ fontSize: '0.72rem', color: '#8a8a8a', marginBottom: '1.5rem' }}>
+            ⚠️ Le montant payé sera écrasé si des paiements individuels sont ensuite ajoutés/confirmés pour ce membre.
+          </div>
+
+          {error && <div style={{ color: '#c0392b', fontSize: '0.82rem', marginBottom: '1rem' }}>⚠️ {error}</div>}
+
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '0.75rem', background: '#f8f5ef',
+              border: '1px solid #ede9e0', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, color: '#666'
+            }}>Annuler</button>
+            <button type="submit" disabled={loading} style={{
+              flex: 2, padding: '0.75rem', background: '#1a3a6b',
+              border: 'none', borderRadius: '8px', cursor: loading ? 'default' : 'pointer',
+              fontWeight: 700, color: '#fff', opacity: loading ? 0.7 : 1
+            }}>{loading ? 'Enregistrement...' : '✅ Enregistrer les modifications'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function Members() {
+  const navigate = useNavigate();
   const [members, setMembers]               = useState([]);
   const [loading, setLoading]               = useState(true);
   const [search, setSearch]                 = useState('');
   const [filterStatus, setFilterStatus]     = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
   const [stats, setStats]                   = useState(null);
+  const [showAddForm, setShowAddForm]       = useState(false);
+  const [editingMember, setEditingMember]   = useState(null); // 🔑 nouveau
+  const [message, setMessage]               = useState('');
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const [membersRes, statsRes] = await Promise.all([
-        api.get('/members'),
-        api.get('/members/stats'),
-      ]);
+  api.get('/members?limit=100'),
+  api.get('/members/stats'),
+]);
       setMembers(membersRes.data.members);
       setStats(statsRes.data.stats);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Suppression d'un membre, avec confirmation
+  const handleDelete = async (member) => {
+    const confirmed = window.confirm(
+      `Voulez-vous vraiment supprimer ${member.firstName} ${member.lastName} (${member.memberNumber}) ?\n\nCette action est irréversible.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/members/${member._id}`);
+      setMessage('✅ Membre supprimé avec succès');
+      setTimeout(() => setMessage(''), 3000);
+      fetchData();
+    } catch (err) {
+      setMessage('❌ Erreur lors de la suppression');
+      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -278,26 +541,45 @@ export default function Members() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{ background: '#1a3a6b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Module Membres</div>
-        </div>
-        <a href="/dashboard" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.82rem' }}>
-          ← Dashboard
-        </a>
-      </nav>
+      <Navbar />
 
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>👥 Membres Acquéreurs</h1>
-          <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Liste officielle AG — 46 membres — Cité Jardin Ndianda</p>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>👥 Membres Acquéreurs</h1>
+            <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Liste officielle AG — 46 membres — Cité Jardin Ndianda</p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button onClick={() => setShowAddForm(true)} style={{
+              background: '#c9973a', color: '#fff', border: 'none',
+              padding: '0.5rem 1.1rem', borderRadius: '8px', cursor: 'pointer',
+              fontSize: '0.82rem', fontWeight: 700, fontFamily: 'inherit',
+            }}>
+              + Ajouter un membre
+            </button>
+            <button onClick={() => navigate('/dashboard')} style={{
+              background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+              padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+            }}>
+              ← Dashboard
+            </button>
+          </div>
         </div>
 
-        {/* STATS */}
+        {message && (
+          <div style={{
+            background: message.includes('✅') ? '#eaf4ee' : '#fdf0ee',
+            border: `1px solid ${message.includes('✅') ? '#2d6a4f' : '#c0392b'}`,
+            color: message.includes('✅') ? '#2d6a4f' : '#c0392b',
+            padding: '0.75rem 1.1rem', borderRadius: '8px',
+            marginBottom: '1.5rem', fontWeight: 600, fontSize: '0.85rem'
+          }}>
+            {message}
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
           {[
             { label: 'Total membres', value: stats?.total || 0,    icon: '👥', color: '#1a3a6b' },
@@ -318,7 +600,6 @@ export default function Members() {
           ))}
         </div>
 
-        {/* FILTRES */}
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <input type="text" placeholder="🔍 Rechercher un membre..."
             value={search} onChange={e => setSearch(e.target.value)}
@@ -339,7 +620,6 @@ export default function Members() {
           </div>
         </div>
 
-        {/* TABLEAU */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: '#8a8a8a' }}>⏳ Chargement...</div>
         ) : (
@@ -393,13 +673,30 @@ export default function Members() {
                         </span>
                       </td>
                       <td style={{ padding: '0.75rem 1rem' }}>
-                        <button onClick={() => setSelectedMember(m)} style={{
-                          background: '#1a3a6b', color: '#fff', border: 'none',
-                          padding: '0.35rem 0.8rem', borderRadius: '6px',
-                          cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700
-                        }}>
-                          🪪 Carte
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                          <button onClick={() => setSelectedMember(m)} style={{
+                            background: '#1a3a6b', color: '#fff', border: 'none',
+                            padding: '0.35rem 0.8rem', borderRadius: '6px',
+                            cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700
+                          }}>
+                            🪪 Carte
+                          </button>
+                          {/* 🔑 Nouveau bouton Modifier */}
+                          <button onClick={() => setEditingMember(m)} style={{
+                            background: '#fdf5e6', color: '#c9973a', border: 'none',
+                            padding: '0.35rem 0.6rem', borderRadius: '6px',
+                            cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700
+                          }}>
+                            ✏️
+                          </button>
+                          <button onClick={() => handleDelete(m)} style={{
+                            background: '#fdf0ee', color: '#c0392b', border: 'none',
+                            padding: '0.35rem 0.6rem', borderRadius: '6px',
+                            cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700
+                          }}>
+                            🗑️
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -412,6 +709,30 @@ export default function Members() {
 
       {selectedMember && (
         <MemberCardModal member={selectedMember} onClose={() => setSelectedMember(null)} />
+      )}
+
+      {showAddForm && (
+        <AddMemberModal
+          onClose={() => setShowAddForm(false)}
+          onSuccess={() => {
+            fetchData();
+            setMessage('✅ Membre créé avec succès');
+            setTimeout(() => setMessage(''), 3000);
+          }}
+        />
+      )}
+
+      {/* 🔑 Formulaire de modification */}
+      {editingMember && (
+        <EditMemberModal
+          member={editingMember}
+          onClose={() => setEditingMember(null)}
+          onSuccess={() => {
+            fetchData();
+            setMessage('✅ Membre modifié avec succès');
+            setTimeout(() => setMessage(''), 3000);
+          }}
+        />
       )}
     </div>
   );

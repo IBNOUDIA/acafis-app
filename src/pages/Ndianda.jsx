@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { LOGO_NAV } from '../assets/logo';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const PHASES = [
   {
@@ -86,6 +87,7 @@ const statusConfig = {
 };
 
 export default function Ndianda() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('apercu');
 
   const tabs = [
@@ -103,23 +105,24 @@ export default function Ndianda() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{ background: '#1a3a6b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Projet Ndianda</div>
-        </div>
-        <a href="/dashboard" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.82rem' }}>
-          ← Dashboard
-        </a>
-      </nav>
+      {/* 🔑 Navbar partagée — hamburger, langue, déconnexion, lien mot de passe */}
+      <Navbar />
 
       {/* HERO */}
       <div style={{
         background: 'linear-gradient(135deg, #1a3a6b 0%, #2d6a4f 100%)',
-        padding: '2.5rem 2rem', color: '#fff', textAlign: 'center'
+        padding: '2.5rem 2rem', color: '#fff', textAlign: 'center', position: 'relative'
       }}>
+        {/* 🔑 navigate() au lieu de <a href> */}
+        <button onClick={() => navigate('/dashboard')} style={{
+          position: 'absolute', top: '1rem', right: '1.5rem',
+          background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)',
+          color: '#fff', padding: '0.4rem 0.9rem', borderRadius: '6px',
+          cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, fontFamily: 'inherit',
+        }}>
+          ← Dashboard
+        </button>
+
         <div style={{ fontSize: '0.72rem', color: '#c9973a', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
           🇸🇳 Nguéniène, Sénégal
         </div>

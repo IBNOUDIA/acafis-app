@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { LOGO_NAV } from '../assets/logo';
+import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 export default function Meetings() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [meetings, setMeetings]       = useState([]);
   const [nextMeeting, setNextMeeting] = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -47,6 +51,68 @@ export default function Meetings() {
     }
   };
 
+  // Génère et télécharge le brouillon de PV en PDF
+  const handleGeneratePv = async () => {
+    try {
+      const response = await api.get(`/meetings/${nextMeeting._id}/generate-pv`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Brouillon_PV_${nextMeeting.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors de la génération du PV');
+    }
+  };
+
+  // 🔑 Télécharge la convocation en PDF
+  const handleDownloadConvocation = async () => {
+    try {
+      const response = await api.get(`/convocations/${nextMeeting._id}/download`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Convocation_${nextMeeting.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du téléchargement de la convocation');
+    }
+  };
+
+  // 🔑 Envoie d'abord un test à toi-même, puis demande confirmation pour envoyer à tous
+  const handleSendConvocations = async () => {
+    try {
+      await api.post(`/convocations/${nextMeeting._id}/test`, {
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
+      });
+
+      const confirmed = window.confirm(
+        `Un email de test vient d'être envoyé à ${user.email}.\n\nVérifiez votre boîte de réception, puis cliquez OK pour envoyer la convocation à TOUS les membres du CA, ou Annuler pour ne pas envoyer.`
+      );
+
+      if (!confirmed) return;
+
+      const res = await api.post(`/convocations/${nextMeeting._id}`);
+      alert(res.data.message);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Erreur lors de l\'envoi des convocations');
+    }
+  };
+
   const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
@@ -82,32 +148,32 @@ export default function Meetings() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
-      {/* NAVBAR */}
-      <nav style={{ background: '#1a3a6b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src={LOGO_NAV} alt="CoopACАFIS"
-            style={{ height: '38px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.72rem' }}>Module Réunions</div>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button onClick={() => setShowForm(true)} style={{
-            background: '#c9973a', color: '#fff', border: 'none',
-            padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer',
-            fontWeight: 700, fontSize: '0.82rem'
-          }}>
-            + Nouvelle réunion
-          </button>
-          <a href="/dashboard" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.82rem' }}>
-            ← Dashboard
-          </a>
-        </div>
-      </nav>
+      {/* 🔑 Navbar partagée — hamburger, langue, déconnexion, lien mot de passe */}
+      <Navbar />
 
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>📅 Réunions CA & AG</h1>
-          <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Mode hybride — Présentiel + Jitsi Meet</p>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ color: '#1a3a6b', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>📅 Réunions CA & AG</h1>
+            <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Mode hybride — Présentiel + Jitsi Meet</p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button onClick={() => setShowForm(true)} style={{
+              background: '#c9973a', color: '#fff', border: 'none',
+              padding: '0.55rem 1.1rem', borderRadius: '6px', cursor: 'pointer',
+              fontWeight: 700, fontSize: '0.82rem', fontFamily: 'inherit',
+            }}>
+              + Nouvelle réunion
+            </button>
+            <button onClick={() => navigate('/dashboard')} style={{
+              background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+              padding: '0.55rem 1rem', borderRadius: '6px', cursor: 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+            }}>
+              ← Dashboard
+            </button>
+          </div>
         </div>
 
         {/* ONGLETS */}
@@ -318,13 +384,21 @@ export default function Meetings() {
                     }}>
                       💻 Rejoindre via Jitsi Meet
                     </a>
-                    <button style={{
+                    {/* 🔑 branché sur handleDownloadConvocation */}
+                    <button onClick={handleDownloadConvocation} style={{
                       background: 'rgba(255,255,255,0.15)', color: '#fff',
                       border: '1px solid rgba(255,255,255,0.3)',
                       padding: '0.75rem 1.5rem', borderRadius: '8px',
                       cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem'
                     }}>
                       📄 Télécharger la convocation
+                    </button>
+                    <button onClick={handleGeneratePv} style={{
+                      background: '#c9973a', color: '#fff', border: 'none',
+                      padding: '0.75rem 1.5rem', borderRadius: '8px',
+                      cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem'
+                    }}>
+                      📝 Générer le brouillon de PV
                     </button>
                   </div>
                 </div>
@@ -366,7 +440,8 @@ export default function Meetings() {
                         <span style={{ fontSize: '0.72rem', color: doc.color, fontWeight: 700 }}>{doc.status}</span>
                       </div>
                     ))}
-                    <button style={{
+                    {/* 🔑 branché sur handleSendConvocations */}
+                    <button onClick={handleSendConvocations} style={{
                       width: '100%', marginTop: '1rem', background: '#1a3a6b', color: '#fff',
                       border: 'none', padding: '0.7rem', borderRadius: '8px',
                       cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem'

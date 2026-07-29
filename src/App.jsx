@@ -9,7 +9,9 @@ import Vote           from './pages/Vote';
 import Documents      from './pages/Documents';
 import Communications from './pages/Communications';
 import Ndianda from './pages/Ndianda';
-
+import ChangePassword from './pages/ChangePassword';
+import Sondages from './pages/Sondages';
+import Bureau from './pages/Bureau';
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
@@ -21,6 +23,7 @@ function PublicRoute({ children }) {
 }
 
 function AppRoutes() {
+  console.log('URL ACTUELLE:', window.location.pathname);
   return (
     <Routes>
       <Route path="/login" element={
@@ -29,9 +32,15 @@ function AppRoutes() {
       <Route path="/dashboard" element={
         <PrivateRoute><Dashboard /></PrivateRoute>
       } />
-      <Route path="/project" element={
-  <PrivateRoute><Ndianda /></PrivateRoute>
+      <Route path="/profile/password" element={
+        <PrivateRoute><ChangePassword /></PrivateRoute>
+      } />
+      <Route path="/sondages" element={
+  <PrivateRoute><Sondages /></PrivateRoute>
 } />
+      <Route path="/project" element={
+        <PrivateRoute><Ndianda /></PrivateRoute>
+      } />
       <Route path="/payments" element={
         <PrivateRoute><Finance /></PrivateRoute>
       } />
@@ -50,6 +59,9 @@ function AppRoutes() {
       <Route path="/communications" element={
         <PrivateRoute><Communications /></PrivateRoute>
       } />
+      <Route path="/bureau" element={
+  <PrivateRoute><Bureau /></PrivateRoute>
+} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
