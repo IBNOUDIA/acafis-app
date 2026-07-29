@@ -10,6 +10,7 @@ export default function Finance() {
   const [members, setMembers]     = useState([]);
   const [loading, setLoading]     = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [generating, setGenerating] = useState(null); // 🔑 nouveau — 'pdf' | 'docx' | null
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +54,27 @@ export default function Finance() {
     { id: 'membres',      label: '👥 État membres' },
   ];
 
+  // 🔑 Nouveau — télécharge le rapport financier généré côté backend (PDF ou Word)
+  const downloadReport = async (format) => {
+    setGenerating(format);
+    try {
+      const res = await api.get(`/reports/financial.${format}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Rapport_Financier_ACAFIS.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors de la génération du rapport');
+    } finally {
+      setGenerating(null);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
 
@@ -70,14 +92,34 @@ export default function Finance() {
               Compte BHS — Coopérative d'Habitat ACAFIS
             </p>
           </div>
-          {/* 🔑 navigate() au lieu de <a href> — retour instantané au dashboard */}
-          <button onClick={() => navigate('/dashboard')} style={{
-            background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
-            padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer',
-            fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
-          }}>
-            ← Retour au dashboard
-          </button>
+
+          {/* 🔑 Boutons de génération du rapport + retour dashboard, groupés */}
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button onClick={() => downloadReport('pdf')} disabled={generating !== null} style={{
+              background: '#c0392b', color: '#fff', border: 'none',
+              padding: '0.5rem 1rem', borderRadius: '8px', cursor: generating ? 'default' : 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+              opacity: generating && generating !== 'pdf' ? 0.6 : 1,
+            }}>
+              {generating === 'pdf' ? '⏳ Génération...' : '📄 Rapport PDF'}
+            </button>
+            <button onClick={() => downloadReport('docx')} disabled={generating !== null} style={{
+              background: '#1a3a6b', color: '#fff', border: 'none',
+              padding: '0.5rem 1rem', borderRadius: '8px', cursor: generating ? 'default' : 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+              opacity: generating && generating !== 'docx' ? 0.6 : 1,
+            }}>
+              {generating === 'docx' ? '⏳ Génération...' : '📝 Rapport Word'}
+            </button>
+            {/* 🔑 navigate() au lieu de <a href> — retour instantané au dashboard */}
+            <button onClick={() => navigate('/dashboard')} style={{
+              background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+              padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer',
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
+            }}>
+              ← Retour au dashboard
+            </button>
+          </div>
         </div>
 
         {/* SOLDE BHS */}

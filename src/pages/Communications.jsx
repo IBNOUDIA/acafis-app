@@ -85,6 +85,24 @@ export default function Communications() {
     setTimeout(() => setMessage(''), 3000);
   };
 
+  // 🔑 Nouveau — construit et ouvre les liens de partage WhatsApp / Facebook.
+  // Pas d'API Meta/WhatsApp Business : juste les liens de partage publics,
+  // qui ouvrent l'app/le site avec le message pré-rempli, sans autorisation à demander.
+  const shareWhatsApp = (ann) => {
+    const text = `${ann.title}\n\n${ann.content}\n\n— Coopérative ACAFIS (coop-acafis.com)`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const shareFacebook = (ann) => {
+    const url = 'https://coop-acafis.com';
+    const quote = `${ann.title} — ${ann.content}`;
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(quote)}`,
+      '_blank',
+      'width=600,height=500'
+    );
+  };
+
   const typeConfig = {
     urgent:  { color: '#c0392b', bg: '#fdf0ee', icon: '🚨', label: 'Urgent' },
     info:    { color: '#1a3a6b', bg: '#eef2f8', icon: 'ℹ️',  label: 'Information' },
@@ -223,19 +241,36 @@ export default function Communications() {
                   </p>
 
                   {/* Pied */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid #ede9e0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid #ede9e0', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ fontSize: '0.78rem', color: '#8a8a8a' }}>
                       ✍️ {ann.author}
                     </div>
-                    {isAdmin && (
-                      <button style={{
-                        background: '#fdf0ee', color: '#c0392b', border: 'none',
-                        padding: '0.3rem 0.7rem', borderRadius: '6px',
-                        cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      {/* 🔑 Nouveau — boutons de partage rapide */}
+                      <button onClick={() => shareWhatsApp(ann)} title="Partager sur WhatsApp" style={{
+                        background: '#e7f7ee', color: '#25D366', border: 'none',
+                        padding: '0.3rem 0.6rem', borderRadius: '6px',
+                        cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700,
                       }}>
-                        🗑️ Supprimer
+                        🟢 WhatsApp
                       </button>
-                    )}
+                      <button onClick={() => shareFacebook(ann)} title="Partager sur Facebook" style={{
+                        background: '#eef2f8', color: '#1877F2', border: 'none',
+                        padding: '0.3rem 0.6rem', borderRadius: '6px',
+                        cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700,
+                      }}>
+                        🔵 Facebook
+                      </button>
+                      {isAdmin && (
+                        <button style={{
+                          background: '#fdf0ee', color: '#c0392b', border: 'none',
+                          padding: '0.3rem 0.7rem', borderRadius: '6px',
+                          cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700
+                        }}>
+                          🗑️ Supprimer
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

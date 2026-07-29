@@ -11,6 +11,7 @@ import Communications from './pages/Communications';
 import Ndianda from './pages/Ndianda';
 import ChangePassword from './pages/ChangePassword';
 import Sondages from './pages/Sondages';
+import Bureau from './pages/Bureau';
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
@@ -58,6 +59,9 @@ function AppRoutes() {
       <Route path="/communications" element={
         <PrivateRoute><Communications /></PrivateRoute>
       } />
+      <Route path="/bureau" element={
+  <PrivateRoute><Bureau /></PrivateRoute>
+} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

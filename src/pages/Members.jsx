@@ -223,7 +223,7 @@ function MemberCardModal({ member, onClose }) {
   );
 }
 
-// 🔑 Nouveau — formulaire d'ajout de membre
+// 🔑 Formulaire d'ajout de membre
 function AddMemberModal({ onClose, onSuccess }) {
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -350,6 +350,132 @@ function AddMemberModal({ onClose, onSuccess }) {
   );
 }
 
+// 🔑 Nouveau — formulaire de modification d'un membre existant
+function EditMemberModal({ member, onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    firstName: member.firstName || '',
+    lastName: member.lastName || '',
+    email: member.email || '',
+    phone: member.phone || '',
+    status: member.status || 'actif',
+    totalAmount: member.financial?.totalAmount ?? '',
+    paidAmount: member.financial?.paidAmount ?? '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const totalAmount = form.totalAmount ? Number(form.totalAmount) : 0;
+      const paidAmount = form.paidAmount ? Number(form.paidAmount) : 0;
+      await api.put(`/members/${member._id}`, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        status: form.status,
+        financial: {
+          ...member.financial,
+          totalAmount,
+          paidAmount,
+          balance: totalAmount - paidAmount,
+        },
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erreur lors de la modification du membre');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem'
+    }}>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <h2 style={{ color: '#1a3a6b', margin: 0 }}>✏️ Modifier {member.firstName} {member.lastName}</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#8a8a8a' }}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Prénom *</label>
+              <input required value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Nom *</label>
+              <input required value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Email *</label>
+            <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Téléphone</label>
+            <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Statut membre</label>
+            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}
+              style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px' }}>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+              <option value="suspendu">Suspendu</option>
+              <option value="désisté">Désisté</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Montant total dû (FCFA)</label>
+              <input type="number" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#1a3a6b', marginBottom: '0.35rem' }}>Montant payé (FCFA)</label>
+              <input type="number" value={form.paidAmount} onChange={e => setForm({ ...form, paidAmount: e.target.value })}
+                style={{ width: '100%', padding: '0.65rem', border: '1.5px solid #ede9e0', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+          <div style={{ fontSize: '0.72rem', color: '#8a8a8a', marginBottom: '1.5rem' }}>
+            ⚠️ Le montant payé sera écrasé si des paiements individuels sont ensuite ajoutés/confirmés pour ce membre.
+          </div>
+
+          {error && <div style={{ color: '#c0392b', fontSize: '0.82rem', marginBottom: '1rem' }}>⚠️ {error}</div>}
+
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: '0.75rem', background: '#f8f5ef',
+              border: '1px solid #ede9e0', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, color: '#666'
+            }}>Annuler</button>
+            <button type="submit" disabled={loading} style={{
+              flex: 2, padding: '0.75rem', background: '#1a3a6b',
+              border: 'none', borderRadius: '8px', cursor: loading ? 'default' : 'pointer',
+              fontWeight: 700, color: '#fff', opacity: loading ? 0.7 : 1
+            }}>{loading ? 'Enregistrement...' : '✅ Enregistrer les modifications'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function Members() {
   const navigate = useNavigate();
   const [members, setMembers]               = useState([]);
@@ -358,17 +484,18 @@ export default function Members() {
   const [filterStatus, setFilterStatus]     = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
   const [stats, setStats]                   = useState(null);
-  const [showAddForm, setShowAddForm]       = useState(false); // 🔑 nouveau
-  const [message, setMessage]               = useState('');   // 🔑 nouveau
+  const [showAddForm, setShowAddForm]       = useState(false);
+  const [editingMember, setEditingMember]   = useState(null); // 🔑 nouveau
+  const [message, setMessage]               = useState('');
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const [membersRes, statsRes] = await Promise.all([
-        api.get('/members'),
-        api.get('/members/stats'),
-      ]);
+  api.get('/members?limit=100'),
+  api.get('/members/stats'),
+]);
       setMembers(membersRes.data.members);
       setStats(statsRes.data.stats);
     } catch (err) {
@@ -378,7 +505,7 @@ export default function Members() {
     }
   };
 
-  // 🔑 Nouvelle fonction — suppression d'un membre, avec confirmation
+  // Suppression d'un membre, avec confirmation
   const handleDelete = async (member) => {
     const confirmed = window.confirm(
       `Voulez-vous vraiment supprimer ${member.firstName} ${member.lastName} (${member.memberNumber}) ?\n\nCette action est irréversible.`
@@ -424,7 +551,6 @@ export default function Members() {
             <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>Liste officielle AG — 46 membres — Cité Jardin Ndianda</p>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            {/* 🔑 Nouveau bouton */}
             <button onClick={() => setShowAddForm(true)} style={{
               background: '#c9973a', color: '#fff', border: 'none',
               padding: '0.5rem 1.1rem', borderRadius: '8px', cursor: 'pointer',
@@ -442,7 +568,6 @@ export default function Members() {
           </div>
         </div>
 
-        {/* 🔑 Message de confirmation/erreur */}
         {message && (
           <div style={{
             background: message.includes('✅') ? '#eaf4ee' : '#fdf0ee',
@@ -556,7 +681,14 @@ export default function Members() {
                           }}>
                             🪪 Carte
                           </button>
-                          {/* 🔑 Nouveau bouton de suppression */}
+                          {/* 🔑 Nouveau bouton Modifier */}
+                          <button onClick={() => setEditingMember(m)} style={{
+                            background: '#fdf5e6', color: '#c9973a', border: 'none',
+                            padding: '0.35rem 0.6rem', borderRadius: '6px',
+                            cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700
+                          }}>
+                            ✏️
+                          </button>
                           <button onClick={() => handleDelete(m)} style={{
                             background: '#fdf0ee', color: '#c0392b', border: 'none',
                             padding: '0.35rem 0.6rem', borderRadius: '6px',
@@ -579,13 +711,25 @@ export default function Members() {
         <MemberCardModal member={selectedMember} onClose={() => setSelectedMember(null)} />
       )}
 
-      {/* 🔑 Formulaire d'ajout de membre */}
       {showAddForm && (
         <AddMemberModal
           onClose={() => setShowAddForm(false)}
           onSuccess={() => {
-            fetchData(); // 🔑 recharge la liste — c'était l'oubli qui causait le bug
+            fetchData();
             setMessage('✅ Membre créé avec succès');
+            setTimeout(() => setMessage(''), 3000);
+          }}
+        />
+      )}
+
+      {/* 🔑 Formulaire de modification */}
+      {editingMember && (
+        <EditMemberModal
+          member={editingMember}
+          onClose={() => setEditingMember(null)}
+          onSuccess={() => {
+            fetchData();
+            setMessage('✅ Membre modifié avec succès');
             setTimeout(() => setMessage(''), 3000);
           }}
         />
