@@ -1,4 +1,5 @@
 const Member = require('../models/Member');
+const fees = require('../config/fees');
 
 // @desc    Tous les membres
 // @route   GET /api/members
@@ -66,7 +67,26 @@ exports.createMember = async (req, res) => {
     const count = await Member.countDocuments();
     const memberNumber = `ACQ-${String(count + 1).padStart(3, '0')}`;
 
-    const member = await Member.create({ ...req.body, memberNumber });
+    // Appliquer automatiquement les montants officiels (part social + cotisations
+    // annuelles écoulées depuis la date d'adhésion), sauf si explicitement fournis.
+    const joinDate = req.body.joinDate ? new Date(req.body.joinDate) : new Date();
+    const montantDu = fees.calculerMontantDu(joinDate);
+
+    const financial = {
+      totalAmount: montantDu,
+      paidAmount: 0,
+      balance: montantDu,
+      partSocialPaye: false,
+      status: 'retard_majeur',
+      ...(req.body.financial || {}), // permet une surcharge manuelle explicite si besoin
+    };
+
+    const member = await Member.create({
+      ...req.body,
+      joinDate,
+      financial,
+      memberNumber,
+    });
 
     res.status(201).json({ success: true, message: 'Membre créé avec succès', member });
   } catch (error) {
@@ -80,9 +100,36 @@ exports.createMember = async (req, res) => {
 // @desc    Modifier un membre
 // @route   PUT /api/members/:id
 // @access  Private (Admin+)
+// @desc    Modifier un membre
+// @route   PUT /api/members/:id
+// @access  Private (Admin+)
 exports.updateMember = async (req, res) => {
   try {
-    const member = await Member.findByIdAndUpdate(req.params.id, req.body, {
+    const body = { ...req.body };
+
+    // Si les montants financiers sont modifiés, recalculer automatiquement
+    // le statut (à_jour / retard_mineur / retard_majeur) et le part social,
+    // pour que le badge de statut reste cohérent avec les montants saisis.
+    if (body.financial) {
+      const totalAmount = Number(body.financial.totalAmount) || 0;
+      const paidAmount   = Number(body.financial.paidAmount) || 0;
+      const balance      = totalAmount - paidAmount;
+
+      let status = 'retard_majeur';
+      if (balance <= 0) status = 'à_jour';
+      else if (paidAmount > 0) status = 'retard_mineur';
+
+      body.financial = {
+        ...body.financial,
+        totalAmount,
+        paidAmount,
+        balance,
+        status,
+        partSocialPaye: paidAmount >= fees.PART_SOCIAL,
+      };
+    }
+
+    const member = await Member.findByIdAndUpdate(req.params.id, body, {
       new: true, runValidators: true
     });
 
@@ -91,6 +138,20 @@ exports.updateMember = async (req, res) => {
     }
 
     res.status(200).json({ success: true, message: 'Membre mis à jour', member });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+};
+// @desc    Supprimer un membre
+// @route   DELETE /api/members/:id
+// @access  Private (Admin+)
+exports.deleteMember = async (req, res) => {
+  try {
+    const member = await Member.findByIdAndDelete(req.params.id);
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Membre introuvable' });
+    }
+    res.status(200).json({ success: true, message: 'Membre supprimé' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }

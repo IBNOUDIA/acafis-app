@@ -9,6 +9,9 @@ const documentRoutes     = require('./documents');
 const voteRoutes         = require('./votes');
 const pvRoutes           = require('./pv');
 const convocationRoutes  = require('./convocations');
+const expenseRoutes      = require('./expenses');
+const reportRoutes       = require('./reports');
+const boardRoutes        = require('./board');
 
 router.use('/auth',         authRoutes);
 router.use('/members',      memberRoutes);
@@ -18,6 +21,9 @@ router.use('/documents',    documentRoutes);
 router.use('/votes',        voteRoutes);
 router.use('/pv',           pvRoutes);
 router.use('/convocations', convocationRoutes);
+router.use('/expenses',     expenseRoutes);
+router.use('/reports',      reportRoutes);
+router.use('/board',        boardRoutes);
 
 // Health check
 router.get('/health', (req, res) => {
