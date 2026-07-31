@@ -1,4 +1,6 @@
+const crypto = require('crypto');
 const Member = require('../models/Member');
+const User = require('../models/User');
 const fees = require('../config/fees');
 
 // @desc    Tous les membres
@@ -88,7 +90,35 @@ exports.createMember = async (req, res) => {
       memberNumber,
     });
 
-    res.status(201).json({ success: true, message: 'Membre créé avec succès', member });
+    // Créer (ou lier) le compte de connexion associé, sinon le membre ne
+    // pourra jamais se connecter à l'application.
+    let tempPassword;
+    const email = (member.email || '').toLowerCase().trim();
+    const isPlaceholderEmail = email.includes('a-confirmer.acafis.ca');
+
+    if (email && !isPlaceholderEmail) {
+      let user = await User.findOne({ email });
+      if (!user) {
+        tempPassword = crypto.randomBytes(6).toString('base64url');
+        user = await User.create({
+          firstName: member.firstName,
+          lastName: member.lastName,
+          email,
+          password: tempPassword,
+          role: 'acquereur',
+          isActive: true,
+        });
+      }
+      member.user = user._id;
+      await member.save();
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Membre créé avec succès',
+      member,
+      ...(tempPassword ? { tempPassword } : {}),
+    });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({ success: false, message: 'Ce membre existe déjà' });
