@@ -3,8 +3,31 @@ const router  = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const Payment = require('../models/Payment');
 const Member  = require('../models/Member');
+const { streamReceiptPdf } = require('../utils/generateReceiptPdf');
 
 router.use(protect);
+
+// Reçu PDF d'un paiement confirmé (le membre concerné ou un admin)
+router.get('/:id/receipt.pdf', async (req, res) => {
+  try {
+    const payment = await Payment.findById(req.params.id)
+      .populate('member', 'firstName lastName memberNumber');
+    if (!payment) return res.status(404).json({ success: false, message: 'Paiement introuvable' });
+
+    const isAdmin = ['super_admin', 'admin', 'admin_finance'].includes(req.user.role);
+    const isOwner = !isAdmin && await Member.exists({ _id: payment.member._id, user: req.user._id });
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ success: false, message: 'Accès refusé' });
+    }
+    if (payment.status !== 'confirmé') {
+      return res.status(400).json({ success: false, message: 'Reçu disponible uniquement pour les paiements confirmés' });
+    }
+
+    streamReceiptPdf(payment, res);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+});
 
 // Historique des paiements du membre connecté
 router.get('/me', async (req, res) => {
