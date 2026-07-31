@@ -138,7 +138,7 @@ export default function Ndianda() {
           {[
             { icon: '🏘️', value: '320',     label: 'Logements' },
             { icon: '👥', value: '46',      label: 'Acquéreurs' },
-            { icon: '📐', value: '15 ha',   label: 'Superficie' },
+            { icon: '📐', value: '10 ha',   label: 'Superficie' },
             { icon: '📅', value: '2030',    label: 'Livraison' },
             { icon: '🏦', value: '3.8M FCFA', label: 'Compte BHS' },
           ].map((s, i) => (
@@ -191,7 +191,7 @@ export default function Ndianda() {
                   <div style={{ fontSize: '0.85rem', color: '#333', lineHeight: 1.7 }}>
                     <div>🇸🇳 <strong>Nguéniène</strong>, Sénégal</div>
                     <div>📍 Région de Kaolack</div>
-                    <div>🏘️ Superficie : ~15 hectares</div>
+                    <div>🏘️ Superficie : ~10 hectares</div>
                     <div>🛣️ Accès routes principales</div>
                   </div>
                 </div>
