@@ -6,7 +6,8 @@ import { LOGO_NAV } from '../assets/logo';
 
 // Liens du menu — un seul endroit à modifier si un module est ajouté/retiré
 const MENU_ITEMS = [
-  { path: '/dashboard', icon: '🏠', label: { fr: 'Tableau de bord', en: 'Dashboard', wo: 'Kër' } },
+  { path: '/dashboard',  icon: '🏠', label: { fr: 'Tableau de bord', en: 'Dashboard', wo: 'Kër' } },
+  { path: '/mon-compte', icon: '💳', label: { fr: 'Mon compte',      en: 'My account', wo: 'Sama compte' } },
   { path: '/members',   icon: '👥', label: { fr: 'Membres',        en: 'Members',   wo: 'Xarit yi' } },
   { path: '/meetings',  icon: '📅', label: { fr: 'Réunions',       en: 'Meetings',  wo: 'Réunion yi' } },
   { path: '/payments',  icon: '💰', label: { fr: 'Finance',        en: 'Finance',   wo: 'Xaalis bi' } },
