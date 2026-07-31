@@ -224,6 +224,21 @@ export default function Navbar() {
                 <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🔒</span>
                 {t('Changer mon mot de passe', 'Change my password', 'Soppi mot de passe')}
               </button>
+
+              <a
+                href="https://coop-acafis.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  width: '100%', padding: '0.95rem 1.5rem', border: 'none',
+                  background: 'transparent', textDecoration: 'none',
+                  cursor: 'pointer', textAlign: 'left', fontSize: '0.92rem', color: '#333',
+                }}
+              >
+                <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🌐</span>
+                {t('Site web de la coopérative', 'Cooperative website', 'Site web bi')}
+              </a>
             </div>
 
             {/* 🔑 Déconnexion accessible directement dans le tiroir sur mobile (le bouton du header devient une icône) */}
