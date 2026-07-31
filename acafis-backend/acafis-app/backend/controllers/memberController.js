@@ -42,6 +42,21 @@ exports.getMembers = async (req, res) => {
   }
 };
 
+// @desc    Fiche membre du compte connecté
+// @route   GET /api/members/me
+// @access  Private
+exports.getMyMember = async (req, res) => {
+  try {
+    const member = await Member.findOne({ user: req.user._id });
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Aucune fiche membre associée à ce compte' });
+    }
+    res.status(200).json({ success: true, member });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+};
+
 // @desc    Un membre
 // @route   GET /api/members/:id
 // @access  Private

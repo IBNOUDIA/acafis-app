@@ -2,8 +2,23 @@ const express = require('express');
 const router  = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const Payment = require('../models/Payment');
+const Member  = require('../models/Member');
 
 router.use(protect);
+
+// Historique des paiements du membre connecté
+router.get('/me', async (req, res) => {
+  try {
+    const member = await Member.findOne({ user: req.user._id });
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Aucune fiche membre associée à ce compte' });
+    }
+    const payments = await Payment.find({ member: member._id }).sort({ paymentDate: -1 });
+    res.status(200).json({ success: true, payments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+});
 
 // Tous les paiements
 router.get('/', authorize('super_admin','admin','admin_finance'), async (req, res) => {
