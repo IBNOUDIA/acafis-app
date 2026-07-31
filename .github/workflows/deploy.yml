@@ -24,12 +24,19 @@ jobs:
             curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -L https://api.github.com/repos/IBNOUDIA/acafis-app/tarball/main \
               -o /tmp/acafis.tar.gz
+            rm -rf /tmp/IBNOUDIA-acafis-app-*/
             tar -xzf /tmp/acafis.tar.gz -C /tmp/
-            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/routes /home/ec2-user/backend/
-            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/services /home/ec2-user/backend/
-            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/models /home/ec2-user/backend/
-            cp -r /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/controllers /home/ec2-user/backend/
-            cp /tmp/IBNOUDIA-acafis-app-*/acafis-backend/acafis-app/backend/server.js /home/ec2-user/backend/
+            SRC=$(find /tmp -maxdepth 1 -type d -name "IBNOUDIA-acafis-app-*")/acafis-backend/acafis-app/backend
+            cp -r "$SRC"/routes         /home/ec2-user/backend/
+            cp -r "$SRC"/services       /home/ec2-user/backend/
+            cp -r "$SRC"/models         /home/ec2-user/backend/
+            cp -r "$SRC"/controllers    /home/ec2-user/backend/
+            cp -r "$SRC"/middleware     /home/ec2-user/backend/
+            cp -r "$SRC"/config         /home/ec2-user/backend/
+            cp -r "$SRC"/utils          /home/ec2-user/backend/
+            cp "$SRC"/server.js         /home/ec2-user/backend/
+            cp "$SRC"/package.json      /home/ec2-user/backend/
+            cp "$SRC"/package-lock.json /home/ec2-user/backend/
             cd /home/ec2-user/backend && npm install --production
             pm2 restart acafis-backend
             rm -rf /tmp/acafis.tar.gz /tmp/IBNOUDIA-acafis-app-*/
