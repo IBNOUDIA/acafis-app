@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
@@ -23,25 +23,12 @@ const INTERAC_EMAIL = 'acafisfinance@gmail.com';
 
 export default function MonCompte() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
   const [member, setMember]     = useState(null);
   const [payments, setPayments] = useState([]);
-  const [documents, setDocuments] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied]     = useState(false);
   const [receiptLoading, setReceiptLoading] = useState(null); // id du paiement en cours
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-
-  const loadDocuments = async () => {
-    try {
-      const res = await api.get('/documents/me');
-      setDocuments(res.data.documents);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +39,6 @@ export default function MonCompte() {
         ]);
         setMember(memberRes.data.member);
         setPayments(paymentsRes.data.payments);
-        await loadDocuments();
       } catch (err) {
         if (err.response?.status === 404) {
           setNotFound(true);
@@ -95,28 +81,6 @@ export default function MonCompte() {
       alert("Erreur lors du téléchargement du reçu");
     } finally {
       setReceiptLoading(null);
-    }
-  };
-
-  const handleFileSelected = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadError('');
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', file.name);
-      await api.post('/documents/me', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      await loadDocuments();
-    } catch (err) {
-      console.error(err);
-      setUploadError(err.response?.data?.message || "Erreur lors de l'envoi du fichier");
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -284,7 +248,7 @@ export default function MonCompte() {
             </div>
 
             {/* HISTORIQUE */}
-            <div style={{ background: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: '1.5rem' }}>
+            <div style={{ background: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <div style={{ padding: '1.25rem 1.5rem 0.5rem', fontWeight: 700, color: '#1a3a6b' }}>
                 📋 Historique de mes paiements
               </div>
@@ -335,51 +299,6 @@ export default function MonCompte() {
                     ))}
                   </tbody>
                 </table>
-              )}
-            </div>
-
-            {/* MES DOCUMENTS */}
-            <div style={{ background: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-                <div style={{ fontWeight: 700, color: '#1a3a6b' }}>
-                  📎 Mes documents envoyés au Bureau
-                </div>
-                <div>
-                  <input ref={fileInputRef} type="file" onChange={handleFileSelected} style={{ display: 'none' }} id="doc-upload" />
-                  <button onClick={() => fileInputRef.current?.click()} disabled={uploading} style={{
-                    background: '#c9973a', color: '#1a3a6b', border: 'none',
-                    padding: '0.5rem 1rem', borderRadius: '8px', cursor: uploading ? 'default' : 'pointer',
-                    fontSize: '0.82rem', fontWeight: 700, fontFamily: 'inherit',
-                    opacity: uploading ? 0.6 : 1,
-                  }}>
-                    {uploading ? '⏳ Envoi...' : '📤 Envoyer un document'}
-                  </button>
-                </div>
-              </div>
-
-              {uploadError && (
-                <div style={{ padding: '0 1.5rem 0.75rem', color: '#c0392b', fontSize: '0.8rem' }}>{uploadError}</div>
-              )}
-
-              {documents.length === 0 ? (
-                <div style={{ padding: '2rem', textAlign: 'center', color: '#8a8a8a' }}>
-                  Aucun document envoyé. Vous pouvez transmettre un reçu de virement, une pièce d'identité, etc.
-                </div>
-              ) : (
-                <div style={{ padding: '0 1.5rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  {documents.map(doc => (
-                    <a key={doc._id} href={doc.fileUrl} target="_blank" rel="noreferrer" style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      background: '#f8f5ef', borderRadius: '8px', padding: '0.75rem 1rem',
-                      textDecoration: 'none', color: '#333',
-                    }}>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>📄 {doc.title}</span>
-                      <span style={{ fontSize: '0.72rem', color: '#8a8a8a' }}>
-                        {new Date(doc.createdAt).toLocaleDateString('fr-FR')}
-                      </span>
-                    </a>
-                  ))}
-                </div>
               )}
             </div>
           </>
