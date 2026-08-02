@@ -12,6 +12,7 @@ const ROLE_LABELS = {
   tresoriere:         '💰 Trésorière',
   tresorier_adjoint:  '💰 Trésorier Adjoint',
   administrateur:     '🧑‍💼 Administrateur',
+  comite_surveillance:'🔍 Comité de Surveillance',
 };
 
 const COMMISSION_LABELS = {
@@ -340,6 +341,7 @@ export default function Bureau() {
   const bureau = members.filter(m => EXECUTIFS.includes(m.role))
     .sort((a, b) => EXECUTIFS.indexOf(a.role) - EXECUTIFS.indexOf(b.role));
   const administrateurs = members.filter(m => m.role === 'administrateur');
+  const surveillance = members.filter(m => m.role === 'comite_surveillance');
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
@@ -402,6 +404,18 @@ export default function Bureau() {
                 <h2 style={{ color: '#1a3a6b', fontSize: '1.1rem', marginBottom: '1rem' }}>🧑‍💼 Administrateurs</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
                   {administrateurs.map(m => (
+                    <MemberCard key={m._id} member={m} isAdmin={isAdmin} onEdit={(mem) => { setEditing(mem); setShowForm(true); }} onDelete={handleDelete} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* COMITÉ DE SURVEILLANCE */}
+            {surveillance.length > 0 && (
+              <>
+                <h2 style={{ color: '#1a3a6b', fontSize: '1.1rem', marginBottom: '1rem' }}>🔍 Comité de Surveillance</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                  {surveillance.map(m => (
                     <MemberCard key={m._id} member={m} isAdmin={isAdmin} onEdit={(mem) => { setEditing(mem); setShowForm(true); }} onDelete={handleDelete} />
                   ))}
                 </div>

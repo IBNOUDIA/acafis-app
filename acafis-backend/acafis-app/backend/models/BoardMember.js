@@ -8,7 +8,7 @@ const boardMemberSchema = new mongoose.Schema({
     type: String,
     enum: [
       'president', 'vice_president', 'secretaire_general', 'secretaire_adjoint',
-      'tresoriere', 'tresorier_adjoint', 'administrateur',
+      'tresoriere', 'tresorier_adjoint', 'administrateur', 'comite_surveillance',
     ],
     required: true,
   },
