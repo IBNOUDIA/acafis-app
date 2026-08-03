@@ -17,6 +17,7 @@ const MENU_ITEMS = [
   { path: '/documents', icon: '📄', label: { fr: 'Documents',      en: 'Documents', wo: 'Papiye yi' } },
   { path: '/project',   icon: '🏗️', label: { fr: 'Projet Ndianda', en: 'Ndianda Project', wo: 'Projet Ndianda' } },
   { path: '/bureau',    icon: '🏛️', label: { fr: 'Bureau',          en: 'Board',     wo: 'Bureau bi' } },
+  { path: '/suivi',     icon: '📊', label: { fr: 'Suivi',           en: 'Progress',  wo: 'Suivi' } },
 ];
 
 const FLAGS = [

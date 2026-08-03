@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [stats, setStats]             = useState(null);
   const [nextMeeting, setNextMeeting] = useState(null);
   const [payments, setPayments]       = useState([]);
+  const [tasks, setTasks]             = useState([]);
   const [loading, setLoading]         = useState(true);
 
   const t = (fr, en, wo) => {
@@ -36,6 +37,13 @@ export default function Dashboard() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+    // 🔑 Requete separee — reservee aux roles Bureau, ne doit pas bloquer le reste du dashboard
+    try {
+      const tasksRes = await api.get('/tasks');
+      setTasks(tasksRes.data.tasks || []);
+    } catch (err) {
+      // rôle sans accès (ex: acquereur) — carte simplement masquée
     }
   };
 
@@ -216,6 +224,39 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* SUIVI DE L'AVANCEMENT */}
+            {tasks.length > 0 && (
+              <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <h3 style={{ color: '#1a3a6b', margin: 0, fontSize: '0.95rem', fontWeight: 700 }}>
+                    📊 {t("Suivi de l'avancement", 'Progress tracking', 'Suivi bi')}
+                  </h3>
+                  <button onClick={() => navigate('/suivi')} style={{
+                    background: 'none', border: '1px solid #ede9e0', color: '#1a3a6b',
+                    padding: '0.35rem 0.8rem', borderRadius: '6px', cursor: 'pointer',
+                    fontSize: '0.75rem', fontWeight: 700, fontFamily: 'inherit',
+                  }}>
+                    {t('Voir la grille complète', 'View full grid', 'Xool suivi bi')} →
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem' }}>
+                  {[
+                    { key: 'a_faire',  label: t('À faire', 'To do', 'Wara'),        color: '#8a8a8a' },
+                    { key: 'en_cours', label: t('En cours', 'In progress', 'Ci biir'), color: '#c9973a' },
+                    { key: 'termine',  label: t('Terminé', 'Done', 'Parey na'),      color: '#2d6a4f' },
+                    { key: 'bloque',   label: t('Bloqué', 'Blocked', 'Tere na'),     color: '#c0392b' },
+                  ].map(s => (
+                    <div key={s.key} style={{ background: '#f8f5ef', borderRadius: '8px', padding: '0.75rem', textAlign: 'center', borderTop: `3px solid ${s.color}` }}>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: s.color }}>
+                        {tasks.filter(task => task.status === s.key).length}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#8a8a8a' }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* MODULES */}
             <div style={{ marginBottom: '1rem' }}>
               <h3 style={{ color: '#1a3a6b', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>
@@ -229,6 +270,7 @@ export default function Dashboard() {
                   { icon: '🗳️', label: t('Votes', 'Votes', 'Vote yi'),               sublabel: 'AG & CA',       path: '/votes',          color: '#4a1942' },
                   { icon: '📄', label: t('Documents', 'Documents', 'Papiye yi'),      sublabel: 'PV & rapports', path: '/documents',      color: '#023e8a' },
                   { icon: '🏗️', label: t('Projet Ndianda', 'Ndianda Project', 'Projet Ndianda'), sublabel: t('Avancement', 'Progress', 'Avancement'), path: '/project', color: '#2d6a4f' },
+                  { icon: '📊', label: t('Suivi', 'Progress', 'Suivi'),              sublabel: t('Tâches & phases', 'Tasks & phases', 'Suivi'), path: '/suivi', color: '#c9973a' },
                   { icon: '📸', label: t('Photos', 'Photos', 'Photos'),              sublabel: 'Facebook',      path: 'https://www.facebook.com/share/18Dw7bCTds/?mibextid=wwXIfr', color: '#1877F2', external: true },
                 ].map((mod, i) => (
                   // 🔑 navigate() au lieu de window.location.href — c'était la cause principale de la lenteur
