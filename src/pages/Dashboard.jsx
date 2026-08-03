@@ -11,10 +11,8 @@ export default function Dashboard() {
   const navigate                      = useNavigate();
   const [stats, setStats]             = useState(null);
   const [nextMeeting, setNextMeeting] = useState(null);
-  const [members, setMembers]         = useState([]);
   const [payments, setPayments]       = useState([]);
   const [loading, setLoading]         = useState(true);
-  const [countdown, setCountdown]     = useState({});
 
   const t = (fr, en, wo) => {
     if (i18n.language === 'en') return en;
@@ -24,37 +22,15 @@ export default function Dashboard() {
 
   useEffect(() => { fetchData(); }, []);
 
-  useEffect(() => {
-    const agDate = new Date('2026-08-01T14:00:00');
-    const timer = setInterval(() => {
-      const now  = new Date();
-      const diff = agDate - now;
-      if (diff <= 0) {
-        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        clearInterval(timer);
-        return;
-      }
-      setCountdown({
-        days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours:   Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000),
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   const fetchData = async () => {
     try {
-      const [statsRes, meetingRes, membersRes, paymentsRes] = await Promise.all([
+      const [statsRes, meetingRes, paymentsRes] = await Promise.all([
         api.get('/members/stats'),
         api.get('/meetings/next'),
-        api.get('/members'),
         api.get('/payments'),
       ]);
       setStats(statsRes.data.stats);
       setNextMeeting(meetingRes.data.meeting);
-      setMembers(membersRes.data.members || []);
       setPayments(paymentsRes.data.payments || []);
     } catch (err) {
       console.error(err);
@@ -82,7 +58,6 @@ export default function Dashboard() {
   };
 
   const graph = cotisationParMois();
-  const membresPresents = members.filter(m => m.notes === '').length;
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f5ef', fontFamily: "'DM Sans', sans-serif" }}>
@@ -108,68 +83,6 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            {/* COMPTE À REBOURS */}
-            <div style={{
-              background: 'linear-gradient(135deg, #1a3a6b, #2e5090)',
-              borderRadius: '16px', padding: '1.5rem 2rem',
-              marginBottom: '1.5rem', color: '#fff',
-              boxShadow: '0 8px 32px rgba(26,58,107,0.3)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: '#c9973a', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-                    🔴 {t('Compte à rebours', 'Countdown', 'Yëgël')}
-                  </div>
-                  <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>
-                    {t('Assemblée Générale ACAFIS 2026', 'ACAFIS General Assembly 2026', 'Réunion Générale ACAFIS 2026')}
-                  </h2>
-                  <p style={{ margin: '0.3rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
-                    {t('1er août 2026 à 14h00 — Mode Hybride', 'August 1st, 2026 at 2:00 PM — Hybrid Mode', '1 Ut 2026 ci 14h00')}
-                  </p>
-                </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  {[
-                    { val: countdown.days,    label: t('Jours', 'Days', 'Fan') },
-                    { val: countdown.hours,   label: t('Heures', 'Hours', 'Waxtu') },
-                    { val: countdown.minutes, label: t('Minutes', 'Minutes', 'Simili') },
-                    { val: countdown.seconds, label: t('Secondes', 'Seconds', 'Saa') },
-                  ].map((item, i) => (
-                    <div key={i} style={{ textAlign: 'center', minWidth: '60px' }}>
-                      <div style={{
-                        background: 'rgba(255,255,255,0.15)', borderRadius: '10px',
-                        padding: '0.5rem', fontSize: '1.8rem', fontWeight: 800, color: '#c9973a',
-                        lineHeight: 1, minWidth: '60px'
-                      }}>
-                        {String(item.val).padStart(2, '0')}
-                      </div>
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        {item.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  {nextMeeting?.meetingUrl && (
-                    <a href={nextMeeting.meetingUrl} target="_blank" rel="noreferrer" style={{
-                      background: '#c9973a', color: '#fff', padding: '0.6rem 1.2rem',
-                      borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.82rem'
-                    }}>
-                      🎥 {t('Rejoindre Jitsi', 'Join Jitsi', 'Dugg Jitsi')}
-                    </a>
-                  )}
-                  {/* 🔑 navigate() au lieu d'un <a href> classique qui rechargerait la page */}
-                  <button onClick={() => navigate('/votes')} style={{
-                    background: 'rgba(255,255,255,0.15)', color: '#fff',
-                    padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none',
-                    cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem',
-                    fontFamily: 'inherit',
-                  }}>
-                    🗳️ {t('Votes en ligne', 'Online Votes', 'Vote yi')}
-                  </button>
-                </div>
-              </div>
-            </div>
-
             {/* STATS CARDS */}
             <div style={{
               display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
@@ -194,8 +107,8 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* GRAPHIQUE + STATUT MEMBRES */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            {/* GRAPHIQUE COTISATIONS */}
+            <div style={{ marginBottom: '1.5rem' }}>
               <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <h3 style={{ color: '#1a3a6b', margin: '0 0 1.25rem', fontSize: '0.95rem', fontWeight: 700 }}>
                   📊 {t('Cotisations reçues par mois (2026)', 'Monthly contributions (2026)', 'Xaalis ji ci weer (2026)')}
@@ -227,45 +140,6 @@ export default function Dashboard() {
                     {graph.data.reduce((a, b) => a + b, 0).toLocaleString('fr-FR')} FCFA
                   </span>
                 </div>
-              </div>
-
-              <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <h3 style={{ color: '#1a3a6b', margin: '0 0 1.25rem', fontSize: '0.95rem', fontWeight: 700 }}>
-                  👥 {t('Statut membres — AG', 'Members status — GA', 'Xarit yi — AG')}
-                </h3>
-                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                  <div style={{ position: 'relative', display: 'inline-block' }}>
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                      <circle cx="60" cy="60" r="48" fill="none" stroke="#ede9e0" strokeWidth="16" />
-                      <circle cx="60" cy="60" r="48" fill="none" stroke="#2d6a4f" strokeWidth="16"
-                        strokeDasharray={`${(membresPresents / (stats?.total || 1)) * 301} 301`}
-                        strokeLinecap="round" transform="rotate(-90 60 60)" />
-                      <circle cx="60" cy="60" r="48" fill="none" stroke="#c9973a" strokeWidth="16"
-                        strokeDasharray={`${(10 / (stats?.total || 1)) * 301} 301`}
-                        strokeLinecap="round"
-                        strokeDashoffset={`-${(membresPresents / (stats?.total || 1)) * 301}`}
-                        transform="rotate(-90 60 60)" />
-                    </svg>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a3a6b' }}>{stats?.total || 0}</div>
-                      <div style={{ fontSize: '0.6rem', color: '#8a8a8a' }}>{t('membres', 'members', 'xarit')}</div>
-                    </div>
-                  </div>
-                </div>
-                {[
-                  { label: t('Présents AG', 'Present GA', 'Amoon na'),    value: membresPresents, color: '#2d6a4f', icon: '✅' },
-                  { label: t('Procurations', 'Proxy', 'Procuration'),     value: 10,              color: '#c9973a', icon: '📋' },
-                  { label: t('Absents', 'Absent', 'Amul'),                value: 11,              color: '#c0392b', icon: '❌' },
-                  { label: t('Statut inconnu', 'Unknown', 'Xamul'),       value: 7,               color: '#8a8a8a', icon: '⬜' },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0', borderBottom: i < 3 ? '1px solid #f8f5ef' : 'none' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.85rem' }}>{item.icon}</span>
-                      <span style={{ fontSize: '0.82rem', color: '#333' }}>{item.label}</span>
-                    </div>
-                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: item.color }}>{item.value}</span>
-                  </div>
-                ))}
               </div>
             </div>
 
