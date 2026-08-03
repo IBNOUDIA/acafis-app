@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
+import { LOGO_NAV } from '../assets/logo';
 
 export default function Dashboard() {
   const { user }                      = useAuth();
@@ -83,6 +84,41 @@ export default function Dashboard() {
           <p style={{ color: '#8a8a8a', marginTop: '0.25rem' }}>
             {t("Tableau de bord — Conseil d'Administration ACAFIS", "Dashboard — ACAFIS Board of Directors", "Bord — Conseil d'Administration ACAFIS")}
           </p>
+        </div>
+
+        {/* CARTE DE MEMBRE — invitation, cliquable */}
+        <div onClick={() => navigate('/mon-compte')} style={{
+          background: 'linear-gradient(135deg, #1a3a6b 0%, #12294d 100%)',
+          borderRadius: '16px', padding: '1.5rem 1.75rem', marginBottom: '1.5rem', color: '#fff',
+          position: 'relative', overflow: 'hidden', boxShadow: '0 8px 24px rgba(26,58,107,0.3)',
+          cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: '1rem',
+        }}>
+          <div style={{
+            position: 'absolute', top: '-30px', right: '-30px', width: '130px', height: '130px',
+            borderRadius: '50%', background: 'rgba(201,151,58,0.15)',
+          }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}>
+            <img src={LOGO_NAV} alt="CoopACAFIS" style={{ height: '32px', objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }} />
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '1rem' }}>
+                {t('💳 Votre carte de membre ACAFIS', '💳 Your ACAFIS membership card', '💳 Sa carte membre ACAFIS')}
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)', marginTop: '0.2rem' }}>
+                {t(
+                  'Consultez votre carte personnalisée dans Mon Compte. La carte physique sera bientôt disponible à la Boutique ACAFIS.',
+                  'View your personalized card in My Account. The physical card will soon be available at the ACAFIS Shop.',
+                  'Xool sa carte ci Mon Compte.'
+                )}
+              </div>
+            </div>
+          </div>
+          <div style={{
+            background: '#c9973a', color: '#1a3a6b', padding: '0.55rem 1.1rem',
+            borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem', whiteSpace: 'nowrap', position: 'relative',
+          }}>
+            {t('Voir ma carte', 'View my card', 'Xool sama carte')} →
+          </div>
         </div>
 
         {loading ? (
