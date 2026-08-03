@@ -229,9 +229,11 @@ export default function Dashboard() {
                   { icon: '🗳️', label: t('Votes', 'Votes', 'Vote yi'),               sublabel: 'AG & CA',       path: '/votes',          color: '#4a1942' },
                   { icon: '📄', label: t('Documents', 'Documents', 'Papiye yi'),      sublabel: 'PV & rapports', path: '/documents',      color: '#023e8a' },
                   { icon: '🏗️', label: t('Projet Ndianda', 'Ndianda Project', 'Projet Ndianda'), sublabel: t('Avancement', 'Progress', 'Avancement'), path: '/project', color: '#2d6a4f' },
+                  { icon: '📸', label: t('Photos', 'Photos', 'Photos'),              sublabel: 'Facebook',      path: 'https://www.facebook.com/share/18Dw7bCTds/?mibextid=wwXIfr', color: '#1877F2', external: true },
                 ].map((mod, i) => (
                   // 🔑 navigate() au lieu de window.location.href — c'était la cause principale de la lenteur
-                  <div key={i} onClick={() => navigate(mod.path)} style={{
+                  // Les modules "external" (ex: Facebook) s'ouvrent dans un nouvel onglet
+                  <div key={i} onClick={() => mod.external ? window.open(mod.path, '_blank', 'noopener,noreferrer') : navigate(mod.path)} style={{
                     background: '#fff', borderRadius: '10px', padding: '1rem',
                     cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
