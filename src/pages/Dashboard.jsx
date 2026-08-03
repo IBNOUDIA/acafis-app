@@ -308,14 +308,19 @@ export default function Dashboard() {
                   { icon: '🏗️', label: t('Projet Ndianda', 'Ndianda Project', 'Projet Ndianda'), sublabel: t('Avancement', 'Progress', 'Avancement'), path: '/project', color: '#2d6a4f' },
                   { icon: '📊', label: t('Suivi', 'Progress', 'Suivi'),              sublabel: t('Tâches & phases', 'Tasks & phases', 'Suivi'), path: '/suivi', color: '#c9973a' },
                   { icon: '📸', label: t('Photos', 'Photos', 'Photos'),              sublabel: 'Facebook',      path: 'https://www.facebook.com/share/18Dw7bCTds/?mibextid=wwXIfr', color: '#1877F2', external: true },
+                  { icon: '🛍️', label: t('Boutique', 'Shop', 'Boutik'),              sublabel: t('Bientôt disponible', 'Coming soon', 'Bientôt'), color: '#c9973a', comingSoon: true },
                 ].map((mod, i) => (
                   // 🔑 navigate() au lieu de window.location.href — c'était la cause principale de la lenteur
-                  // Les modules "external" (ex: Facebook) s'ouvrent dans un nouvel onglet
-                  <div key={i} onClick={() => mod.external ? window.open(mod.path, '_blank', 'noopener,noreferrer') : navigate(mod.path)} style={{
+                  // Les modules "external" (ex: Facebook) s'ouvrent dans un nouvel onglet ; "comingSoon" n'ont pas encore de lien
+                  <div key={i} onClick={() => {
+                    if (mod.comingSoon) return alert(t('Boutique ACAFIS — bientôt disponible !', 'ACAFIS Shop — coming soon!', 'Boutik ACAFIS — bientôt !'));
+                    mod.external ? window.open(mod.path, '_blank', 'noopener,noreferrer') : navigate(mod.path);
+                  }} style={{
                     background: '#fff', borderRadius: '10px', padding: '1rem',
                     cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    borderBottom: `3px solid ${mod.color}`, textAlign: 'center'
+                    borderBottom: `3px solid ${mod.color}`, textAlign: 'center',
+                    opacity: mod.comingSoon ? 0.7 : 1,
                   }}
                     onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'; }}
                     onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}

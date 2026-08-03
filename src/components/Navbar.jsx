@@ -18,6 +18,7 @@ const MENU_ITEMS = [
   { path: '/project',   icon: '🏗️', label: { fr: 'Projet Ndianda', en: 'Ndianda Project', wo: 'Projet Ndianda' } },
   { path: '/bureau',    icon: '🏛️', label: { fr: 'Bureau',          en: 'Board',     wo: 'Bureau bi' } },
   { path: '/suivi',     icon: '📊', label: { fr: 'Suivi',           en: 'Progress',  wo: 'Suivi' } },
+  { path: '#',          icon: '🛍️', label: { fr: 'Boutique',        en: 'Shop',      wo: 'Boutik' }, comingSoon: true },
 ];
 
 const FLAGS = [
@@ -198,7 +199,9 @@ export default function Navbar() {
                 return (
                   <button
                     key={item.path}
-                    onClick={() => goTo(item.path)}
+                    onClick={() => item.comingSoon
+                      ? alert(t('Boutique ACAFIS — bientôt disponible !', 'ACAFIS Shop — coming soon!', 'Boutik ACAFIS — bientôt !'))
+                      : goTo(item.path)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.75rem',
                       width: '100%', padding: '0.95rem 1.5rem', border: 'none', // 🔑 zone tactile agrandie
@@ -210,6 +213,14 @@ export default function Navbar() {
                   >
                     <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{item.icon}</span>
                     {t(item.label.fr, item.label.en, item.label.wo)}
+                    {item.comingSoon && (
+                      <span style={{
+                        marginLeft: 'auto', fontSize: '0.62rem', fontWeight: 700, color: '#c9973a',
+                        background: '#fdf5e6', padding: '0.15rem 0.5rem', borderRadius: '10px',
+                      }}>
+                        {t('Bientôt', 'Soon', 'Bientôt')}
+                      </span>
+                    )}
                   </button>
                 );
               })}
