@@ -298,6 +298,7 @@ export default function Bureau() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = ['super_admin', 'admin'].includes(user?.role);
+  const isBureau = ['super_admin', 'admin', 'admin_finance', 'membre_ca'].includes(user?.role);
 
   const [members, setMembers] = useState([]);
   const [acquereurs, setAcquereurs] = useState([]); // 🔑 nouveau
@@ -418,6 +419,37 @@ export default function Bureau() {
                   {surveillance.map(m => (
                     <MemberCard key={m._id} member={m} isAdmin={isAdmin} onEdit={(mem) => { setEditing(mem); setShowForm(true); }} onDelete={handleDelete} />
                   ))}
+                </div>
+              </>
+            )}
+
+            {/* DOCUMENTS FINANCIERS — Comité de Surveillance (Google Drive) */}
+            {isBureau && (
+              <>
+                <h2 style={{ color: '#1a3a6b', fontSize: '1.1rem', marginBottom: '1rem' }}>
+                  📁 Documents financiers — Comité de Surveillance
+                </h2>
+                <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#8a8a8a' }}>
+                      Relevés de compte et pièces partagés par le Comité de Surveillance.
+                    </p>
+                    <a
+                      href="https://drive.google.com/drive/folders/1ySCxEEaiMGJ5ZlbcLLJ15LLm3zXJ6wk0"
+                      target="_blank" rel="noopener noreferrer"
+                      style={{
+                        background: '#1a3a6b', color: '#fff', textDecoration: 'none',
+                        padding: '0.4rem 0.9rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                      }}
+                    >
+                      🔗 Ouvrir dans Google Drive
+                    </a>
+                  </div>
+                  <iframe
+                    src="https://drive.google.com/embeddedfolderview?id=1ySCxEEaiMGJ5ZlbcLLJ15LLm3zXJ6wk0#list"
+                    title="Documents financiers — Comité de Surveillance"
+                    style={{ width: '100%', height: '400px', border: '1px solid #ede9e0', borderRadius: '8px' }}
+                  />
                 </div>
               </>
             )}
