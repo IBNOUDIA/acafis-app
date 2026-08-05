@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LOGO_NAV } from '../assets/logo';
 
+// URL publique de la boutique coopérative, déployée séparément sur Vercel
+export const BOUTIQUE_URL = 'https://boutique.coop-acafis.com';
+
 // Liens du menu — un seul endroit à modifier si un module est ajouté/retiré
 const MENU_ITEMS = [
   { path: '/dashboard',  icon: '🏠', label: { fr: 'Tableau de bord', en: 'Dashboard', wo: 'Kër' } },
@@ -18,7 +21,7 @@ const MENU_ITEMS = [
   { path: '/project',   icon: '🏗️', label: { fr: 'Projet Ndianda', en: 'Ndianda Project', wo: 'Projet Ndianda' } },
   { path: '/bureau',    icon: '🏛️', label: { fr: 'Bureau',          en: 'Board',     wo: 'Bureau bi' } },
   { path: '/suivi',     icon: '📊', label: { fr: 'Suivi',           en: 'Progress',  wo: 'Suivi' } },
-  { path: '#',          icon: '🛍️', label: { fr: 'Boutique',        en: 'Shop',      wo: 'Boutik' }, comingSoon: true },
+  { path: BOUTIQUE_URL, icon: '🛍️', label: { fr: 'Boutique',        en: 'Shop',      wo: 'Boutik' }, external: true },
 ];
 
 const FLAGS = [
@@ -199,8 +202,8 @@ export default function Navbar() {
                 return (
                   <button
                     key={item.path}
-                    onClick={() => item.comingSoon
-                      ? alert(t('Boutique ACAFIS — bientôt disponible !', 'ACAFIS Shop — coming soon!', 'Boutik ACAFIS — bientôt !'))
+                    onClick={() => item.external
+                      ? (setMenuOpen(false), window.open(item.path, '_blank', 'noopener,noreferrer'))
                       : goTo(item.path)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.75rem',
@@ -213,14 +216,6 @@ export default function Navbar() {
                   >
                     <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{item.icon}</span>
                     {t(item.label.fr, item.label.en, item.label.wo)}
-                    {item.comingSoon && (
-                      <span style={{
-                        marginLeft: 'auto', fontSize: '0.62rem', fontWeight: 700, color: '#c9973a',
-                        background: '#fdf5e6', padding: '0.15rem 0.5rem', borderRadius: '10px',
-                      }}>
-                        {t('Bientôt', 'Soon', 'Bientôt')}
-                      </span>
-                    )}
                   </button>
                 );
               })}
