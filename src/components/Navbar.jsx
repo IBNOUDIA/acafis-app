@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { LOGO_NAV } from '../assets/logo';
 
 // URL publique de la boutique coopérative, déployée séparément sur Vercel
-export const BOUTIQUE_URL = 'https://boutique.coop-acafis.com';
+// TODO: remplacer par https://boutique.coop-acafis.com une fois le domaine personnalisé relié
+export const BOUTIQUE_URL = 'https://boutique-acafis.vercel.app';
 
 // Liens du menu — un seul endroit à modifier si un module est ajouté/retiré
 const MENU_ITEMS = [
