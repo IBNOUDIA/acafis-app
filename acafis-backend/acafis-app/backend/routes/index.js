@@ -13,6 +13,7 @@ const expenseRoutes      = require('./expenses');
 const reportRoutes       = require('./reports');
 const boardRoutes        = require('./board');
 const taskRoutes         = require('./tasks');
+const assistantRoutes    = require('./assistant');
 
 router.use('/auth',         authRoutes);
 router.use('/members',      memberRoutes);
@@ -26,6 +27,7 @@ router.use('/expenses',     expenseRoutes);
 router.use('/reports',      reportRoutes);
 router.use('/board',        boardRoutes);
 router.use('/tasks',        taskRoutes);
+router.use('/assistant',    assistantRoutes);
 
 // Health check
 router.get('/health', (req, res) => {
